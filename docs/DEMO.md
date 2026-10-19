@@ -24,6 +24,17 @@
 9. Negative case: register an independent claim **C**, then submit a well-formed repo notice for the wrong chain or claim ID with a correct full document digest. `review_notice(C, commit, digest)` should return `INVALID_SCOPE`, leaving C active. Alternatively use a different version-only notice to demonstrate `KEEP`, or a temporary invalid digest for `SOURCE_MISMATCH`.
 10. Record exact 40/64-char commit/content hashes, GenLayer Explorer TX links, `case/claim_status` readbacks and screenshot/error details in `docs/STUDIONET_EVIDENCE.md` **after observing them**.
 
+## Prepared live notice for the confirmed A → B instance (2026-10-19)
+
+**A and B readbacks confirmed:** A (ID 1) is `ACTIVE`, and B (ID 2) is `ACTIVE` with `parent_a=1`; both `can_rely` views returned `true`. The A issuer is `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb`, on Studionet chain `61999`.
+
+A deterministic notice was created at `notices/aurora-v1.txt`, committed and fetched back without content differences. **Do not prepare or modify another notice for this demo.**
+
+- Exact source URL: https://raw.githubusercontent.com/bearbaba/relynx/bad26c15ab4a294142545ce2c48f78bbc0a923b5/notices/aurora-v1.txt
+- `review_notice` inputs: `claim_id = 1`, `commit = "bad26c15ab4a294142545ce2c48f78bbc0a923b5"`, `notice_sha256 = "1e6e5862f6fc0fd5a2a3861555eae09497a09f32785bf4711936408353e09388"`.
+- Expected full-consensus decision: `REVOKE`; actual result **not yet observed**.
+- After observing a FINALIZED **successful execution**, verify `claim_status(1)` shows `REVOKED`; then read `can_rely(1)` and `can_rely(2)` again. B's own `state` should remain `ACTIVE`, with `can_rely=false`.
+
 ## Build a notice
 
 Create `build/notice_body.txt` with a sentence such as:
