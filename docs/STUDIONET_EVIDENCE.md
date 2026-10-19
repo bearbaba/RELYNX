@@ -88,7 +88,7 @@ This readback confirms the direct A → B dependency, which is necessary to demo
 - `STATEMENT_SHA256`: `cb26c28fd2056de111ee3970d20d3f50b244285d0a2b8ecf3c257c5bad436213`.
 - Notice statement (184 characters): `Effective immediately, the issuer explicitly revokes and withdraws the Aurora v1.0 integration safety certification for library Aurora v1.0 recorded in Claim #1; it is no longer valid.`
 - GitHub content at the pinned commit was fetched again and compared to the prepared exact document.
-- **Actual on-chain state observed subsequently:** `claim_status(1).last_decision = REVOKE`, `state = REVOKED`, with exact `last_notice_sha256 = revocation_sha256` equal to the pinned notice digest above. The user has now supplied the full `review_notice` transaction hash, and the Studio screenshot marks it **FINALIZED**. Detailed Execution Result and validator consensus history remain separate evidence to capture.
+- **Actual on-chain state observed subsequently:** `claim_status(1).last_decision = REVOKE`, `state = REVOKED`, with exact `last_notice_sha256 = revocation_sha256` equal to the pinned notice digest above. The user also supplied Explorer transaction details confirming **FINALIZED**, **Execution SUCCESS**, **Consensus Accepted** and return **REVOKE**; full individual-validator history has not been supplied.
 
 ## Successful AI review — transaction details (2026-10-19)
 
