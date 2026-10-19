@@ -35,6 +35,10 @@ The pasted `contract_code` contains the `as_address` correction which converts S
 
 **Integration NOT YET verified:** successful deployment alone does not prove the cross-contract `gl.get_contract_at(...).view()` call, nor that the consumer enforces the source eligibility. The next mandatory Studio readbacks are `policy()`, `receipt_count()`, `can_act(2)` and `can_act(3)`, then a rejected `perform_action(2, "blocked-v1")`, a successful `perform_action(3, "allowed-v2")`, and a durable `receipt(1)`. All of these remain *expected*, not claimed as observed.
 
+## Consumer Gate follow-up evidence (2026-10-19)
+
+[Dedicated consumer live evidence](CONSUMER_LIVE_EVIDENCE.md) records matching `policy()`/`can_act()` views, the expected Claim #2 `claim not eligible` rollback (Studio ACCEPTED / ERROR), and the Claim #3 `perform_action` FINALIZED / GenVM SUCCESS return ID 1. Final `receipt_count()` and `receipt(1)` state reads remain pending.
+
 ## Studionet transaction evidence — 2026-10-19
 
 The user provided all four complete transaction hashes and a GenLayer Studio screenshot marking each transaction **FINALIZED**. The action mapping below follows the Studio transaction list. **FINALIZED means the transaction lifecycle finished; it does not alone certify execution success.** Direct Explorer detail retrieval was unavailable, so the screenshot is the provenance for the status claim.
