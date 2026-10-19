@@ -1,6 +1,6 @@
 # RELYNX — One-contract Studionet demonstration
 
-**Status: core A → B revocation demonstrated by user-provided Studionet view readbacks (2026-10-19).** The full `review_notice` hash and Studio FINALIZED status are recorded; detailed Execution Result and validator history remain to be captured; the issuer claim is synthetic, not a genuine outside-party certification.
+**Status: core A → B revocation demonstrated by user-provided Studionet view readbacks (2026-10-19).** The full `review_notice` hash and Studio FINALIZED status are recorded; Explorer transaction details now confirm Execution SUCCESS, Consensus Accepted and return REVOKE; complete per-validator outputs remain to be captured; the issuer claim is synthetic, not a genuine outside-party certification.
 
 ## Contract
 
@@ -33,7 +33,7 @@ A deterministic notice was created at `notices/aurora-v1.txt`, committed and fet
 - Exact source URL: https://raw.githubusercontent.com/bearbaba/relynx/bad26c15ab4a294142545ce2c48f78bbc0a923b5/notices/aurora-v1.txt
 - `review_notice` inputs: `claim_id = 1`, `commit = "bad26c15ab4a294142545ce2c48f78bbc0a923b5"`, `notice_sha256 = "1e6e5862f6fc0fd5a2a3861555eae09497a09f32785bf4711936408353e09388"`.
 - **Observed in subsequent `claim_status` readbacks:** Claim #1 is `REVOKED` with `last_decision = REVOKE` and matching full notice SHA-256; Claim #2 remains `ACTIVE` but its derived `can_rely` has switched `true → false`. This confirms the read-side dependency consequence.
-- **Observed:** complete `review_notice(1)` [TX hash](https://explorer-studio.genlayer.com/tx/0xe4d5c3ea361293152e406326b029ed41234251bdf6c108e8dfa9cd37f0f57624), marked **FINALIZED** in the user's Studio transaction list. Still required for detailed verification: explicit Execution Result and validator-by-validator consensus history; do not infer execution success from a FINALIZED badge alone.
+- **Observed:** complete `review_notice(1)` [TX hash](https://explorer-studio.genlayer.com/tx/0xe4d5c3ea361293152e406326b029ed41234251bdf6c108e8dfa9cd37f0f57624), marked **FINALIZED** in the user's Studio transaction list. The user-provided Explorer transaction details show Execution SUCCESS, Consensus Accepted and return REVOKE. Individual validator outputs remain incomplete in the supplied excerpt.
 
 ## Build a notice
 
