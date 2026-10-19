@@ -1,0 +1,47 @@
+# RELYNX — One-contract Studionet demonstration
+
+**Status: not executed yet.** Do not describe synthetic test fixtures as genuine outside-party certifications.
+
+## Contract
+
+- Source: `contracts/relynx.py`, class `Relynx`.
+- Studionet chain ID: `61999`.
+- Parameterless constructor.
+- No web UI required.
+
+## Minimal write/read path
+
+1. Deploy `Relynx` to GenLayer Studionet in **Normal (Full Consensus)** mode for AI actions. Record the Explorer `FINALIZED` contract TX.
+2. Call `register_claim("bearbaba", "relynx", "aurora-v1", "Issuer certifies library Aurora v1.0 as compliant with the published integration safety policy.", 0, 0)` from the chosen issuer wallet; record its returned claim ID **A** (probably 1 in a fresh contract).
+3. Call `register_claim("bearbaba", "relynx", "aurora-service", "Issuer declares Aurora integration service relies on the Aurora v1.0 safety certification.", A, 0)`; record returned child ID **B**. (These statements are illustrative, *not external verified certifications*.)
+4. Read `can_rely(A)` and `can_rely(B)` — both should be `true`. Check `claim_status(B)` shows dependency on A and `state=ACTIVE`.
+5. Prepare an **issuer-published** notice whose exact header includes chain ID, claim ID, issuer address, registered repo, key and the immutable on-chain statement digest. Its body should explicitly and unambiguously revoke *Aurora v1.0*; the sentence must be 24–240 characters and clearly match the original. The helper below creates the correct bytes and hashes.
+6. Commit the notice to `notices/aurora-v1.txt` in **this registered repository**. Copy the resulting **full 40-character lowercase Git commit SHA**. Because source policy pins the path, do not change the file after computing its hash unless you also use the new commit and digest.
+7. From any wallet call `review_notice(A, git_commit_sha, notice_sha256)` under **Normal (Full Consensus)**. Inspect the actual result rather than assuming success. A correct `REVOKE` result changes A's `state` to `REVOKED`, with a stored revocation source URL and digest.
+8. Read `can_rely(A)=false` and `can_rely(B)=false`, **without submitting a transaction to update B**. Check `claim_status(B).state` remains `ACTIVE` but its derived `can_rely` field is `false`.
+9. Negative case: register an independent claim **C**, then submit a well-formed repo notice for the wrong chain or claim ID with a correct full document digest. `review_notice(C, commit, digest)` should return `INVALID_SCOPE`, leaving C active. Alternatively use a different version-only notice to demonstrate `KEEP`, or a temporary invalid digest for `SOURCE_MISMATCH`.
+10. Record exact 40/64-char commit/content hashes, GenLayer Explorer TX links, `case/claim_status` readbacks and screenshot/error details in `docs/STUDIONET_EVIDENCE.md` **after observing them**.
+
+## Build a notice
+
+Create `build/notice_body.txt` with a sentence such as:
+
+> This notice immediately withdraws our Aurora v1.0 integration safety certification in its entirety.
+
+Run locally after deployment and registration, substituting the **actual issuer wallet**:
+
+```bash
+python scripts/prepare_notice.py \
+  --claim-id 1 --chain-id 61999 \
+  --issuer 0xYOUR_FULL_40_HEX_ADDRESS \
+  --repo bearbaba/relynx --key aurora-v1 \
+  --statement "Issuer certifies library Aurora v1.0 as compliant with the published integration safety policy." \
+  --body-file build/notice_body.txt \
+  --output notices/aurora-v1.txt
+```
+
+Use **exactly** the same lower-case `repo_owner` and `repo_name` as in `register_claim`. The printed `<FULL_40_HEX_COMMIT>` URL becomes permanent after you commit and push the notice. The contract computes the URL internally, so `review_notice()` accepts the 40-character commit, not an arbitrary URL.
+
+### Do not mistakenly make a live claim
+
+This scenario demonstrates a self-issued, illustrative claim and a synthetic retraction, not a real safety certification. A production consumer must verify the issuer's credibility and repo relationship through its own trust policy. These are intentionally different from the cryptographic checks inside RELYNX.
