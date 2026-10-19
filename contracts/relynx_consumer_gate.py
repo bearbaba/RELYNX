@@ -53,15 +53,19 @@ class RelynxConsumerGate(gl.Contract):
 
     def __init__(self, relynx: Address, issuer: Address,
                  repository: str, key_prefix: str):
+        # Studio decodes Address parameters, while DirectVM often supplies
+        # raw hexadecimal strings. Normalize before writing Address storage.
+        source = relynx if isinstance(relynx, Address) else Address(relynx)
+        trusted = issuer if isinstance(issuer, Address) else Address(issuer)
         zero = Address("0x" + "0" * 40)
-        require(relynx != zero and issuer != zero, "zero trusted address")
-        require(relynx != issuer, "invalid contract address")
+        require(source != zero and trusted != zero, "zero trusted address")
+        require(source != trusted, "invalid contract address")
         require(valid_repo(repository), "invalid trusted repository")
         require(type(key_prefix) is str and
                 re.fullmatch(r"[a-z0-9][a-z0-9_-]{1,30}", key_prefix) is not None,
                 "invalid key prefix")
-        self.relynx = relynx
-        self.issuer = issuer
+        self.relynx = source
+        self.issuer = trusted
         self.repository = repository
         self.key_prefix = key_prefix
         self.chain_id = str(gl.message.chain_id)
