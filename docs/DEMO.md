@@ -35,6 +35,20 @@ A deterministic notice was created at `notices/aurora-v1.txt`, committed and fet
 - **Observed in subsequent `claim_status` readbacks:** Claim #1 is `REVOKED` with `last_decision = REVOKE` and matching full notice SHA-256; Claim #2 remains `ACTIVE` but its derived `can_rely` has switched `true → false`. This confirms the read-side dependency consequence.
 - **Observed:** complete `review_notice(1)` [TX hash](https://explorer-studio.genlayer.com/tx/0xe4d5c3ea361293152e406326b029ed41234251bdf6c108e8dfa9cd37f0f57624), marked **FINALIZED** in the user's Studio transaction list. The user-provided Explorer transaction details show Execution SUCCESS, Consensus Accepted and return REVOKE. Individual validator outputs remain incomplete in the supplied excerpt.
 
+## Additional live negative-case test — KEEP for Claim #3 (pending)
+
+A third independent claim has been registered and confirmed by Studio readback: `claim_id=3`, `key=aurora-v2`, `state=ACTIVE`, `can_rely=true`, with no parents. This claim asserts an illustrative Aurora v2.0 certification and is independent of the revoked Aurora v1.0 source claim.
+
+The exact issuer-source notice is pinned at:
+https://raw.githubusercontent.com/bearbaba/relynx/1cbd8ccbd5d5a7163c33d6864adf3196e38d9968/notices/aurora-v2.txt
+
+Call `review_notice` in Studio Normal (Full Consensus) with:
+- `claim_id = 3`
+- `commit = 1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`
+- `notice_sha256 = 7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260`
+
+This notice explicitly states that Aurora v2.0 remains valid and is not revoked. **Expected result is KEEP**, with `claim_status(3).state=ACTIVE` and `can_rely(3)=true`; the result has not yet been observed. Obtain the `review_notice(3)` transaction hash, Execution Result and follow-up readback before claiming the negative test passed.
+
 ## Build a notice
 
 Create `build/notice_body.txt` with a sentence such as:
