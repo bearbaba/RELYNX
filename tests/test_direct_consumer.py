@@ -20,7 +20,8 @@ def test_consumer_constructor_and_policy(direct_vm, direct_deploy):
     settings = json.loads(c.policy())
     assert settings["repository"] == "bearbaba/relynx"
     assert settings["key_prefix"] == "aurora-"
-    assert settings["chain_id"] == "61999"
+    # DirectVM test harness defaults to chain 1; deployed Studionet is 61999.
+    assert settings["chain_id"] == "1"
     with direct_vm.expect_revert("unknown receipt"):
         c.receipt(1)
 
