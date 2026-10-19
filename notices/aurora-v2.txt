@@ -1,0 +1,10 @@
+RELYNX_NOTICE_V1
+CHAIN_ID: 61999
+CLAIM_ID: 3
+ISSUER: 0x4c7cb73ac8f8999af21cfc9ff4cf2333a9508dcb
+REPO: bearbaba/relynx
+KEY: aurora-v2
+STATEMENT_SHA256: 87533fb191260ad538cf1d17b22e7da6220de40bf3391e3307ee644ff77b4d2a
+
+[NOTICE]
+The issuer confirms that the Aurora v2.0 integration safety certification recorded in Claim #3 remains valid and is not revoked, withdrawn, suspended, or superseded by the earlier Aurora v1.0 notice.
