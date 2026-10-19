@@ -48,6 +48,6 @@ No funds, deposits, global reputation or automatic third-party penalties. A down
 - [Notice preparation](scripts/prepare_notice.py) — build exact bytes and SHA-256 with the correct chain, claim ID and issuer.
 - [GitHub Actions](.github/workflows/ci.yml) — Python tests, GenVM linter and DirectVM.
 
-**Status:** V1 source and tests; no deployed Studio address, live validator consensus or finalized transaction is claimed until verified. This is an experimental testnet primitive, not a security audit.
+**Studionet deployment (2026-10-19):** [RELYNX instance](https://studio.genlayer.com/?import-contract=0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa) at `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`. The user-provided GenLayer Studio screenshot shows the **Deploy transaction FINALIZED**; its complete TX hash has not yet been supplied. Claim registration, issuer notice, GenLayer comparative-consensus review and dependency invalidation remain to be demonstrated. Do not confuse deployment with functional consensus verification. This is an experimental testnet primitive, not a security audit.
 
 License: MIT.

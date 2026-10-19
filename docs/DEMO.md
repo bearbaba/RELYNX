@@ -8,6 +8,8 @@
 - Studionet chain ID: `61999`.
 - Parameterless constructor.
 - No web UI required.
+- **Deployed RELYNX instance (user Studio screenshot, 2026-10-19):** https://studio.genlayer.com/?import-contract=0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa (`0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`); Deploy transaction displayed FINALIZED. Record complete deployment TX separately; no substantive claim/notice write has been observed.
+- Before `register_claim`, read `claim_count()` to verify the fresh instance is at 0. The illustrative example assumes returned IDs 1 and 2; use actual returned IDs if not.
 
 ## Minimal write/read path
 
