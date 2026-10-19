@@ -37,7 +37,7 @@ The pasted `contract_code` contains the `as_address` correction which converts S
 
 ## Consumer Gate follow-up evidence (2026-10-19)
 
-[Dedicated consumer live evidence](CONSUMER_LIVE_EVIDENCE.md) records matching `policy()`/`can_act()` views, the expected Claim #2 `claim not eligible` rollback (Studio ACCEPTED / ERROR), and the Claim #3 `perform_action` FINALIZED / GenVM SUCCESS return ID 1. Final `receipt_count()` and `receipt(1)` state reads remain pending.
+[Dedicated consumer live evidence](CONSUMER_LIVE_EVIDENCE.md) records matching `policy()`/`can_act()` views, the expected Claim #2 `claim not eligible` rollback (Studio ACCEPTED / ERROR), and the Claim #3 `perform_action` FINALIZED / GenVM SUCCESS return ID 1. **Final accepted readbacks confirm `receipt_count()=1` and `receipt(1)` persisted Claim #3 / `allowed-v2` / the submitting actor.** The cross-contract integration workflow is now evidenced end-to-end.
 
 ## Studionet transaction evidence — 2026-10-19
 
