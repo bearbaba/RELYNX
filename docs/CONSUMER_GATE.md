@@ -50,6 +50,18 @@ The earlier error occurred *during deployment*; it does not demonstrate cross-co
 
 Use Normal mode on GenLayer Studionet (chain 61999), simulation OFF. Deploy this **new** consumer alongside the original RELYNX instance; do not re-deploy or mutate the RELYNX source contract.
 
+## Live deployment — confirmed GenVM SUCCESS (2026-10-19)
+
+The consumer has now been deployed as an independent contract:
+
+- **Consumer address:** `0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b`
+- [Open in Studio](https://studio.genlayer.com/?import-contract=0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b)
+- [Deploy transaction — `0xeb2ac841f66f1dd635f48a2d3f3c702d605bb0068cc1a62f3bf42979835aa454`](https://explorer-studio.genlayer.com/tx/0xeb2ac841f66f1dd635f48a2d3f3c702d605bb0068cc1a62f3bf42979835aa454)
+- **User-provided Explorer receipt:** `FINALIZED`, `GenVM Execution SUCCESS`, `Consensus Accepted`, Normal mode, five initial validators; deployed source includes numeric-ABI constructor normalization.
+- **Original RELYNX remains at** `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`. No redeployment of RELYNX was needed.
+
+The consumer is **deployed**, but runtime interaction with the original RELYNX contract and consumer action receipts still require live read/write tests below. Do not classify cross-contract integration as verified yet.
+
 ## Mandatory live acceptance sequence (NOT YET EXECUTED)
 
 1. Read `policy()`, confirm correct RELYNX/issuer/repository/prefix and chain `61999`.
