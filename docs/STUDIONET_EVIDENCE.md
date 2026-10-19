@@ -144,16 +144,49 @@ A synthetic, explicit **non-revocation** notice for independent Claim #3 was cre
 - `notice_sha256`: `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260` (425 UTF-8 bytes, no trailing newline)
 - Intent: assert Aurora v2.0 certification remains valid, explicitly differentiate it from the revoked Aurora v1.0 certificate
 - **Next live write:** `review_notice(3, "1cbd8ccbd5d5a7163c33d6864adf3196e38d9968", "7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260")`.
-- **Observed on-chain readbacks:** `claim_status(3)` returns **`last_decision = KEEP`**, **`state = ACTIVE`**, **`can_rely = true`** with its notice SHA-256 matching the pinned file, and a subsequent dedicated `can_rely(3)` call returned **`true`**. The user now also supplied the full `review_notice(3)` [TX hash](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9). Its `FINALIZED` state, execution result and validator consensus history have not been separately verified; the public Explorer page could not be fetched here.
+- **Observed on-chain readbacks:** `claim_status(3)` returns **`last_decision = KEEP`**, **`state = ACTIVE`**, **`can_rely = true`** with its notice SHA-256 matching the pinned file, and a subsequent dedicated `can_rely(3)` call returned **`true`**. The user now also supplied the full `review_notice(3)` [TX hash](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9). The user subsequently supplied the complete Explorer transaction detail: FINALIZED, GenVM SUCCESS, Consensus Accepted, Return KEEP, Initial Validators 5, and an exact Equivalence Principle output with a full matching source digest. The complete per-validator transcript has not been supplied.
 
-## Claim #3 review transaction reference — awaiting Explorer detail
+## Claim #3 review transaction — Explorer detail confirmed
 
 - Method identified in the demo sequence: `review_notice(3)`
 - Full user-supplied hash: [`0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9`](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9)
 - Expected input commit: `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`
 - Expected notice SHA-256: `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260`
 - Observed **post-review claim state:** `KEEP / ACTIVE / can_rely=true`; independently repeated `can_rely(3)` view returns `true`.
-- **Pending confirmation:** Explorer execution/finality and individual validator or aggregate consensus evidence. Neither receipt contents nor explicit per-validator agreement has been supplied with this URL.
+- **Confirmed from user-provided Explorer transaction details:** FINALIZED; GenVM Execution SUCCESS; Consensus Accepted; Return Value `"KEEP"`; Initial Validators `5`; Rotation Count `0`; one Equivalence Principle output includes a full source hash and the supporting quotation. This establishes aggregate consensus acceptance, not an individual 5/5 vote transcript.
+
+## Claim #3 KEEP — transaction execution and comparative-consensus proof (2026-10-19)
+
+The user provided a complete text excerpt from the [GenLayer Explorer transaction](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9); details below are grounded in that supplied record, not an independently fetched Explorer page.
+
+| Field | User-provided Explorer result |
+| --- | --- |
+| Hash | `0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9` |
+| Status | **FINALIZED** |
+| From | `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb` |
+| To | `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa` |
+| Value | `0 GEN` |
+| Nonce | `379` |
+| Created At | `Oct 19, 2026, 6:18:51 PM` (Explorer display) |
+| Execution Mode | `Normal` |
+| Initial Validators | `5` |
+| Rotation Count | `0` |
+| Consensus Result | **Accepted** |
+| Method | `review_notice` |
+| Input #0 | `3` |
+| Input #1 | `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968` |
+| Input #2 | `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260` |
+| GenVM Execution Result | **SUCCESS** |
+| Return Value | **`"KEEP"`** |
+| Stdout / Stderr | Empty |
+
+**Equivalence Principle Output 0:**
+
+```json
+{"decision":"KEEP","quote":"The issuer confirms that the Aurora v2.0 integration safety certification recorded in Claim #3 remains valid and is not revoked, withdrawn, suspended, or superseded by the earlier Aurora v1.0 notice.","source_sha256":"7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260"}
+```
+
+The exact notice digest matches the committed `notices/aurora-v2.txt` and the accepted `claim_status(3).last_notice_sha256` readback. The follow-up `can_rely(3)` view returned **true**, so the accepted KEEP decision left the unrelated Aurora v2.0 attestation usable. Five *initial* validators were reported; the data provided does not enumerate all individual validator votes.
 
 ## Claim #3 post-review `KEEP` readback — 2026-10-19
 
@@ -175,9 +208,9 @@ The user submitted a subsequent **GenLayer Studio `claim_status(3)` Response (Ac
 | `last_quote_sha256` | `4b0b96b9c6052a13b38cd7478c07368f02716be27f639bd91bec873d54fd1943` |
 | `revocation_sha256` / `revocation_url` | Both empty |
 
-**Interpretation:** RELYNX recorded a non-revocation decision while leaving an independent Aurora v2.0 certificate eligible and unrevoked. The user separately rechecked `can_rely(3)` and received `true` from Studio. The notice digest exactly matches the immutable file pinned at commit `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`. The review TX hash is now available but its actual FINALIZED / SUCCESS receipt has not yet been provided.
+**Interpretation:** RELYNX recorded a non-revocation decision while leaving an independent Aurora v2.0 certificate eligible and unrevoked. The user separately rechecked `can_rely(3)` and received `true` from Studio. The notice digest exactly matches the immutable file pinned at commit `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`. The full user-provided Explorer transaction detail confirms FINALIZED / Execution SUCCESS / Consensus Accepted / Return `KEEP`.
 
-**Live negative scenario demonstrated at the contract-state level:** Claim #3 returned `KEEP` and remains eligible, with a separate `can_rely(3)=true` read. For transaction-level verification, inspect the provided [review transaction](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9) for explicit `FINALIZED`, `Execution SUCCESS`, `Consensus Accepted` and `Return "KEEP"` before asserting those outcomes. An additional `INVALID_SCOPE` case is optional.
+**Live negative scenario demonstrated at the contract-state level:** Claim #3 returned `KEEP` and remains eligible, with a separate `can_rely(3)=true` read. Transaction-level verification is also provided: the user copied the [review transaction](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9) details showing `FINALIZED`, `Execution SUCCESS`, `Consensus Accepted` and Return `"KEEP"`. Individual five-validator outputs were not all included. An additional `INVALID_SCOPE` case is optional.
 
 The intended acceptance gates are (i) A/B initially usable, (ii) issuer repo committed a version/claim-bound correction, (iii) GenLayer `REVOKE` resolution actually finalized, (iv) A and dependent B both no longer usable while B itself has not been rewritten, (v) invalid scope or non-revocation notice cannot revoke an unaffected C, (vi) source code/tests/CI green.
 
