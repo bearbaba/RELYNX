@@ -153,3 +153,22 @@ def test_genvm_runner_header_is_first_two_lines():
     assert header[0] == "# v0.1.0"
     assert header[1].startswith('# { "Depends": "py-genlayer:')
     assert header[1].endswith('" }')
+
+
+def test_studio_integer_abi_constructor_matches_trusted_scope(setup):
+    gate, _, _ = setup
+    studio_relynx = 603798820436434350875562760861357013470701254394
+    studio_issuer = 436664552539068798913473189849452005376679513547
+    other = gate.__class__(studio_relynx, studio_issuer,
+                           "bearbaba/relynx", "aurora-")
+    assert other.relynx.lower() == str(RELYNX).lower()
+    assert other.issuer.lower() == str(ISSUER).lower()
+    assert other.can_act(2) is False
+    assert other.can_act(3) is True
+
+
+@pytest.mark.parametrize("bad", [-1, 1 << 160, True, "bad-address", "0x123"])
+def test_consumer_rejects_invalid_address_abi(setup, bad):
+    gate, _, _ = setup
+    with pytest.raises(UserError, match="invalid"):
+        gate.__class__(bad, ISSUER, "bearbaba/relynx", "aurora-")
