@@ -12,6 +12,29 @@
 - **Observed from user-provided `claim_status` readbacks:** Claim #1 now `REVOKED` with `last_decision = REVOKE`, and Claim #2 stays `ACTIVE` but inherits `can_rely = false` via `parent_a = 1`. Both had `can_rely = true` before review.
 - **Recorded:** four complete TX hashes; Studio screenshot labels all four **FINALIZED**, including `review_notice(1)`. The user has provided the transaction detail reporting FINALIZED, GenVM Execution SUCCESS, Consensus Accepted and return REVOKE. Initial validator count: 5; the full five-validator transcript was not supplied. Optional raw `revocation_url` inspection remains.
 
+## Consumer Gate — separate contract deployed (2026-10-19)
+
+The user supplied the GenLayer Explorer deployment detail for an **independent consumer contract**. It is distinct from the original, unchanged RELYNX contract.
+
+| Field | User-supplied Explorer value |
+| --- | --- |
+| Contract class | `RelynxConsumerGate` |
+| Deployed address | `0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b` |
+| Studio link | https://studio.genlayer.com/?import-contract=0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b |
+| Deployment transaction | [`0xeb2ac841f66f1dd635f48a2d3f3c702d605bb0068cc1a62f3bf42979835aa454`](https://explorer-studio.genlayer.com/tx/0xeb2ac841f66f1dd635f48a2d3f3c702d605bb0068cc1a62f3bf42979835aa454) |
+| Status | **FINALIZED** |
+| GenVM Execution | **SUCCESS**; Return Value `null` (expected for constructor) |
+| Consensus | **Accepted**, Normal execution, 5 initial validators |
+| From | `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb` |
+| Nonce | `381` |
+| Created | `Oct 19, 2026, 7:54:02 PM` (Explorer display) |
+| Source header | `# v0.1.0`, pinned py-genlayer Depends runner |
+| Constructor inputs | Source RELYNX `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`, issuer `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb`, repository `bearbaba/relynx`, prefix `aurora-` |
+
+The pasted `contract_code` contains the `as_address` correction which converts Studio-decoded 160-bit address integers to GenLayer `Address` values. Unlike the previous failed deployment attempt (`ACCEPTED / ERROR`, `OverflowError`), this separate deployment is reported **FINALIZED with GenVM SUCCESS**.
+
+**Integration NOT YET verified:** successful deployment alone does not prove the cross-contract `gl.get_contract_at(...).view()` call, nor that the consumer enforces the source eligibility. The next mandatory Studio readbacks are `policy()`, `receipt_count()`, `can_act(2)` and `can_act(3)`, then a rejected `perform_action(2, "blocked-v1")`, a successful `perform_action(3, "allowed-v2")`, and a durable `receipt(1)`. All of these remain *expected*, not claimed as observed.
+
 ## Studionet transaction evidence — 2026-10-19
 
 The user provided all four complete transaction hashes and a GenLayer Studio screenshot marking each transaction **FINALIZED**. The action mapping below follows the Studio transaction list. **FINALIZED means the transaction lifecycle finished; it does not alone certify execution success.** Direct Explorer detail retrieval was unavailable, so the screenshot is the provenance for the status claim.
