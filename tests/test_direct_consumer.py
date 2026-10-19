@@ -32,3 +32,15 @@ def test_invalid_action_reverts_before_cross_contract_access(direct_vm, direct_d
     with direct_vm.expect_revert("invalid action key"):
         c.perform_action(3, "?not-valid")
     assert c.receipt_count() == 0
+
+
+def test_studio_integer_abi_addresses_deploy_in_directvm(direct_vm, direct_deploy):
+    """Reproduce the exact numeric constructor input received in Studio."""
+    relynx_u160 = 603798820436434350875562760861357013470701254394
+    issuer_u160 = 436664552539068798913473189849452005376679513547
+    c = direct_deploy("contracts/relynx_consumer_gate.py",
+                      relynx_u160, issuer_u160, "bearbaba/relynx", "aurora-")
+    p = json.loads(c.policy())
+    assert p["relynx"].lower() == RELYNX.lower()
+    assert p["issuer"].lower() == ISSUER.lower()
+    assert c.receipt_count() == 0
