@@ -35,6 +35,19 @@ def canonical(data) -> str:
     return json.dumps(data, sort_keys=True, separators=(",", ":"))
 
 
+def as_address(value) -> Address:
+    """Convert Studio u160 integer inputs into GenLayer Address."""
+    if isinstance(value, Address):
+        return value
+    if type(value) is int:
+        require(0 <= value < (1 << 160), "invalid 160-bit address")
+        return Address("0x" + format(value, "040x"))
+    require(type(value) is str and
+            re.fullmatch(r"0x[0-9a-fA-F]{40}", value) is not None,
+            "invalid address")
+    return Address(value)
+
+
 @allow_storage
 @dataclass
 class ActionReceipt:
@@ -56,8 +69,8 @@ class RelynxConsumerGate(gl.Contract):
                  repository: str, key_prefix: str):
         # Studio decodes Address parameters, while DirectVM often supplies
         # raw hexadecimal strings. Normalize before writing Address storage.
-        source = relynx if isinstance(relynx, Address) else Address(relynx)
-        trusted = issuer if isinstance(issuer, Address) else Address(issuer)
+        source = as_address(relynx)
+        trusted = as_address(issuer)
         zero = Address("0x" + "0" * 40)
         require(source != zero and trusted != zero, "zero trusted address")
         require(source != trusted, "invalid contract address")
