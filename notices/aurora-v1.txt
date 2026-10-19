@@ -1,0 +1,10 @@
+RELYNX_NOTICE_V1
+CHAIN_ID: 61999
+CLAIM_ID: 1
+ISSUER: 0x4c7cb73ac8f8999af21cfc9ff4cf2333a9508dcb
+REPO: bearbaba/relynx
+KEY: aurora-v1
+STATEMENT_SHA256: cb26c28fd2056de111ee3970d20d3f50b244285d0a2b8ecf3c257c5bad436213
+
+[NOTICE]
+Effective immediately, the issuer explicitly revokes and withdraws the Aurora v1.0 integration safety certification for library Aurora v1.0 recorded in Claim #1; it is no longer valid.
