@@ -1,6 +1,6 @@
 # RELYNX — One-contract Studionet demonstration
 
-**Status: not executed yet.** Do not describe synthetic test fixtures as genuine outside-party certifications.
+**Status: core A → B revocation demonstrated by user-provided Studionet view readbacks (2026-10-19).** Full `review_notice` transaction hash, finality and validator-level receipt remain to be captured; the issuer claim is synthetic, not a genuine outside-party certification.
 
 ## Contract
 
@@ -8,8 +8,8 @@
 - Studionet chain ID: `61999`.
 - Parameterless constructor.
 - No web UI required.
-- **Deployed RELYNX instance (user Studio screenshot, 2026-10-19):** https://studio.genlayer.com/?import-contract=0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa (`0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`); Deploy transaction displayed FINALIZED. Record complete deployment TX separately; no substantive claim/notice write has been observed.
-- Before `register_claim`, read `claim_count()` to verify the fresh instance is at 0. The illustrative example assumes returned IDs 1 and 2; use actual returned IDs if not.
+- **Deployed RELYNX instance (user Studio screenshot, 2026-10-19):** https://studio.genlayer.com/?import-contract=0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa (`0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`); Deploy transaction displayed FINALIZED. Live claims 1/2 and the inherited revocation consequence are now visible by readbacks; collect the missing write TX hashes.
+- The issuer has registered **actual claim IDs 1 and 2**; the original baseline and post-revocation readbacks are recorded in [STUDIONET_EVIDENCE.md](STUDIONET_EVIDENCE.md). Do not re-register these demo claims.
 
 ## Minimal write/read path
 
@@ -32,8 +32,8 @@ A deterministic notice was created at `notices/aurora-v1.txt`, committed and fet
 
 - Exact source URL: https://raw.githubusercontent.com/bearbaba/relynx/bad26c15ab4a294142545ce2c48f78bbc0a923b5/notices/aurora-v1.txt
 - `review_notice` inputs: `claim_id = 1`, `commit = "bad26c15ab4a294142545ce2c48f78bbc0a923b5"`, `notice_sha256 = "1e6e5862f6fc0fd5a2a3861555eae09497a09f32785bf4711936408353e09388"`.
-- Expected full-consensus decision: `REVOKE`; actual result **not yet observed**.
-- After observing a FINALIZED **successful execution**, verify `claim_status(1)` shows `REVOKED`; then read `can_rely(1)` and `can_rely(2)` again. B's own `state` should remain `ACTIVE`, with `can_rely=false`.
+- **Observed in subsequent `claim_status` readbacks:** Claim #1 is `REVOKED` with `last_decision = REVOKE` and matching full notice SHA-256; Claim #2 remains `ACTIVE` but its derived `can_rely` has switched `true → false`. This confirms the read-side dependency consequence.
+- **Still required for complete external verification:** exact `review_notice` transaction hash, `FINALIZED` plus successful execution, and validator consensus details. Do not invent or assume those receipts.
 
 ## Build a notice
 
