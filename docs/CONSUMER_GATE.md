@@ -28,6 +28,17 @@ To avoid accidental loss of that header, use the **entire raw Python file** from
 
 This fix changes only the consumer source header, not RELYNX's deployed code, storage, or past consensus receipts. The regression test guards the first two source lines. A green DirectVM CI run validates compilation/tests; the actual Studio cross-contract call still needs live execution.
 
+## Studio deployment ERROR — numeric address constructor fix (2026-10-19)
+
+An attempted deployment returned `ACCEPTED / ERROR` with `OverflowError: cannot fit 'int' into an index-sized integer` at `Address(relynx)`. Studio decoded the two `address` constructor parameters as 160-bit integers, rather than Python hexadecimal strings:
+
+- RELYNX address decoded as `603798820436434350875562760861357013470701254394`
+- Issuer address decoded as `436664552539068798913473189849452005376679513547`
+
+These are the correct numeric representations of the published source contract and issuer addresses. The new `as_address()` helper converts an integer in the unsigned 160-bit range to a 40-digit hexadecimal address before constructing GenLayer `Address`. It preserves validated hexadecimal inputs and already-instantiated Address objects, and rejects out-of-range values.
+
+The earlier error occurred *during deployment*; it does not demonstrate cross-contract behavior. Use the latest source file, replace the old Studio draft entirely, and deploy a fresh consumer instance. Regression tests now exercise the exact two Studio ABI values in both local tests and DirectVM.
+
 ## Constructor (for Studionet instance)
 
 | Parameter | Value |
