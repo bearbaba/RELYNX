@@ -47,7 +47,7 @@ Call `review_notice` in Studio Normal (Full Consensus) with:
 - `commit = 1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`
 - `notice_sha256 = 7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260`
 
-This notice explicitly states that Aurora v2.0 remains valid and is not revoked. **Observed in a user-provided `claim_status(3)` readback:** `last_decision = KEEP`, `state = ACTIVE`, `can_rely = true`, exact source SHA-256 matched and revocation fields remain empty. Obtain the `review_notice(3)` full transaction hash, `FINALIZED`/Execution Result and consensus detail before claiming independently verified transaction finality.
+This notice explicitly states that Aurora v2.0 remains valid and is not revoked. **Observed:** `claim_status(3)` returns `last_decision = KEEP`, `state = ACTIVE`, `can_rely = true` with the exact notice digest and no revocation fields; a separate Studio `can_rely(3)` read returns `true`. Full [`review_notice(3)` transaction hash](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9) received. Open the transaction to confirm its `FINALIZED`, Execution Result and consensus detail before claiming verified transaction finality.
 
 ## Build a notice
 
