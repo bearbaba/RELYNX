@@ -52,4 +52,8 @@ No funds, deposits, global reputation or automatic third-party penalties. A down
 
 **Additional Studionet control case:** Claim #3, independent of Claim #1, has a user-provided post-review `claim_status(3)` readback showing **`last_decision = KEEP`, `state = ACTIVE`, `can_rely = true`** and a full matching source digest for the pinned [Aurora v2.0 non-revocation notice](https://raw.githubusercontent.com/bearbaba/relynx/1cbd8ccbd5d5a7163c33d6864adf3196e38d9968/notices/aurora-v2.txt). A separate `can_rely(3)` Studio readback returned **`true`**, and the complete [`review_notice(3)` TX hash](https://explorer-studio.genlayer.com/tx/0x223424f06e1b73e3026c7f2db139a4b3fe59c298b12da713952a268995deaaf9) has now been supplied. The user-provided Explorer detail confirms **FINALIZED / GenVM SUCCESS / Consensus Accepted / return `KEEP`**, with a matching full notice SHA-256 in Equivalence Principle Output 0. Both contrasting consensus cases are now documented in the [evidence ledger](docs/STUDIONET_EVIDENCE.md).
 
+## Optional consumer contract: RELYNX Consumer Gate
+
+A [standalone companion Intelligent Contract](docs/CONSUMER_GATE.md) is available at [`contracts/relynx_consumer_gate.py`](contracts/relynx_consumer_gate.py). It reads `claim_status()` and `can_rely()` from RELYNX at the time of each action, checks the trusted issuer/repository/key scope and stores a receipt only when permitted. The planned network demonstration contrasts **Claim #2 (revoked-ancestor; deny)** with **Claim #3 (KEEP; allow)**. Source tests and CI are not evidence that the separate consumer has been deployed or cross-called successfully on Studionet; record that later.
+
 License: MIT.
