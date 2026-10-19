@@ -60,9 +60,9 @@ The consumer has now been deployed as an independent contract:
 - **User-provided Explorer receipt:** `FINALIZED`, `GenVM Execution SUCCESS`, `Consensus Accepted`, Normal mode, five initial validators; deployed source includes numeric-ABI constructor normalization.
 - **Original RELYNX remains at** `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`. No redeployment of RELYNX was needed.
 
-**Live integration results:** `policy()` matched, `receipt_count()` was initially 0, `can_act(2)=false`, and `can_act(3)=true`. A user-shared Studio screenshot shows `perform_action(2, "blocked-v1")` reverted with `claim not eligible`, while Explorer shows `perform_action(3, "allowed-v2")` FINALIZED / SUCCESS / returned receipt ID 1. See [Consumer Live Evidence](CONSUMER_LIVE_EVIDENCE.md). The final `receipt_count()` and `receipt(1)` storage reads are still pending.
+**Live integration results:** `policy()` matched, `receipt_count()` was initially 0, `can_act(2)=false`, and `can_act(3)=true`. A user-shared Studio screenshot shows `perform_action(2, "blocked-v1")` reverted with `claim not eligible`, while Explorer shows `perform_action(3, "allowed-v2")` FINALIZED / SUCCESS / returned receipt ID 1. See [Consumer Live Evidence](CONSUMER_LIVE_EVIDENCE.md). The final accepted Studio storage readbacks confirm **`receipt_count()=1`** and **`receipt(1)` holds `receipt_id=1`, `claim_id=3`, `action_key=allowed-v2` and the issuing actor**. Full details are recorded in [Consumer Live Evidence](CONSUMER_LIVE_EVIDENCE.md).
 
-## Mandatory live acceptance sequence (reads and writes observed; receipt storage pending)
+## Mandatory live acceptance sequence (completed on Studionet)
 
 1. Read `policy()`, confirm correct RELYNX/issuer/repository/prefix and chain `61999`.
 2. Read `receipt_count()` = `0`.
@@ -70,8 +70,8 @@ The consumer has now been deployed as an independent contract:
 4. Write `perform_action(2, "blocked-v1")` expected `ERROR` with `claim not eligible`. Record complete rejected TX, execution error and unchanged `receipt_count()=0`. Finality alone does not signal success.
 5. Read `can_act(3)` expected `true`: Claim #3 is `ACTIVE` and its own review verdict was `KEEP`.
 6. Write `perform_action(3, "allowed-v2")` expected `FINALIZED` with Execution `SUCCESS`, returns `1`.
-7. Read `receipt_count()` expected `1`, then `receipt(1)` showing `claim_id=3`, caller wallet and `action_key="allowed-v2"`.
-8. Save transaction hashes and readbacks in `docs/STUDIONET_EVIDENCE.md`. These are expectations, not assertions of a completed on-chain demo.
+7. **PASS — accepted Studio readbacks:** `receipt_count()=1` and `receipt(1)` exactly identifies Claim #3, the action `allowed-v2`, receipt ID 1 and actor `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb`.
+8. **PASS:** Full transaction hashes and state evidence are recorded in [CONSUMER_LIVE_EVIDENCE.md](CONSUMER_LIVE_EVIDENCE.md). The rejected Claim #2 transaction has an expected ERROR result, not a successful write; the Claim #3 write has SUCCESS and a persisted receipt.
 
 ## Testing
 
