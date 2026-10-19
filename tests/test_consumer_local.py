@@ -55,7 +55,7 @@ def setup(monkeypatch):
         Contract=object, vm=types.SimpleNamespace(UserError=UserError),
         public=types.SimpleNamespace(write=lambda f: f, view=lambda f: f),
         message=types.SimpleNamespace(sender_address=ACTOR, chain_id=61999),
-        get_contract_at=lambda address: Source() if address == RELYNX else None
+        get_contract_at=lambda address: Source() if str(address).lower() == str(RELYNX).lower() else None
     )
     fake.gl = gl
     monkeypatch.setitem(sys.modules, "genlayer", fake)
