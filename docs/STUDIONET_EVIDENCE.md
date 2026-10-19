@@ -144,9 +144,31 @@ A synthetic, explicit **non-revocation** notice for independent Claim #3 was cre
 - `notice_sha256`: `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260` (425 UTF-8 bytes, no trailing newline)
 - Intent: assert Aurora v2.0 certification remains valid, explicitly differentiate it from the revoked Aurora v1.0 certificate
 - **Next live write:** `review_notice(3, "1cbd8ccbd5d5a7163c33d6864adf3196e38d9968", "7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260")`.
-- **Expected but NOT YET OBSERVED:** comparative consensus returns `KEEP`; Claim #3 stays `ACTIVE` with `can_rely(3)=true`. An accepted `KEEP` receipt and follow-up `claim_status(3)` are required to prove the negative scenario.
+- **Observed on-chain readback:** `claim_status(3)` now returns **`last_decision = KEEP`**, **`state = ACTIVE`**, **`can_rely = true`**, with `last_notice_sha256` equal to the pinned notice hash above. The exact `review_notice(3)` transaction hash, GenVM execution details, validator outputs and finality receipt have not yet been provided.
 
-**Remaining demonstration:** a controlled KEEP or INVALID_SCOPE negative test would strengthen evidence; neither has yet been demonstrated live.
+## Claim #3 post-review `KEEP` readback — 2026-10-19
+
+The user submitted a subsequent **GenLayer Studio `claim_status(3)` Response (Accepted)**, after preparing and reviewing the pinned Aurora v2.0 non-revocation notice.
+
+| Field | Observed value |
+| --- | --- |
+| `claim_id` | `3` |
+| `chain_id` | `61999` |
+| `issuer` | `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb` |
+| `repo` / `key` | `bearbaba/relynx` / `aurora-v2` |
+| `statement` | `Issuer certifies library Aurora v2.0 as compliant with the published integration safety policy.` |
+| `statement_sha256` | `87533fb191260ad538cf1d17b22e7da6220de40bf3391e3307ee644ff77b4d2a` |
+| `parent_a` / `parent_b` / `depth` | `0` / `0` / `1` |
+| `state` | **`ACTIVE`** |
+| `can_rely` | **`true`** |
+| `last_decision` | **`KEEP`** |
+| `last_notice_sha256` | `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260` |
+| `last_quote_sha256` | `4b0b96b9c6052a13b38cd7478c07368f02716be27f639bd91bec873d54fd1943` |
+| `revocation_sha256` / `revocation_url` | Both empty |
+
+**Interpretation:** RELYNX recorded a non-revocation decision while leaving an independent Aurora v2.0 certificate eligible and unrevoked. This is evidence of the *resulting contract state*, not yet a stand-alone proof that the `review_notice(3)` transaction itself has a `FINALIZED / SUCCESS` Explorer receipt. The notice digest in the readback exactly matches the immutable file already pinned at commit `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`.
+
+**Live negative scenario demonstrated at the contract-state level:** Claim #3 returned `KEEP` and remains eligible. For transaction-level verification, obtain the `review_notice(3)` TX hash and its `FINALIZED / SUCCESS / Consensus Accepted` detail, rather than inferring these properties from a view alone. An additional `INVALID_SCOPE` case is optional.
 
 The intended acceptance gates are (i) A/B initially usable, (ii) issuer repo committed a version/claim-bound correction, (iii) GenLayer `REVOKE` resolution actually finalized, (iv) A and dependent B both no longer usable while B itself has not been rewritten, (v) invalid scope or non-revocation notice cannot revoke an unaffected C, (vi) source code/tests/CI green.
 
