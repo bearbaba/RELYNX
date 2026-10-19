@@ -10,7 +10,7 @@
 - The Studio's Read Methods panel displays **State: Accepted**; this is a separate label and does not undo the deploy FINALIZED transaction status.
 - **Recorded:** issuer wallet, both `claim_status` readbacks, positive eligibility A/B, confirmed `parent_a = 1`, and source-committed, SHA-256-pinned notice for Claim #1.
 - **Observed from user-provided `claim_status` readbacks:** Claim #1 now `REVOKED` with `last_decision = REVOKE`, and Claim #2 stays `ACTIVE` but inherits `can_rely = false` via `parent_a = 1`. Both had `can_rely = true` before review.
-- **Recorded:** four complete TX hashes; Studio screenshot labels all four **FINALIZED**, including `review_notice(1)`. Detailed execution result and validator history for the review are not yet provided; Explorer receipts have not been independently retrieved. Optional raw `revocation_url` inspection remains.
+- **Recorded:** four complete TX hashes; Studio screenshot labels all four **FINALIZED**, including `review_notice(1)`. The user has provided the transaction detail reporting FINALIZED, GenVM Execution SUCCESS, Consensus Accepted and return REVOKE. Initial validator count: 5; the full five-validator transcript was not supplied. Optional raw `revocation_url` inspection remains.
 
 ## Studionet transaction evidence — 2026-10-19
 
@@ -90,6 +90,14 @@ This readback confirms the direct A → B dependency, which is necessary to demo
 - GitHub content at the pinned commit was fetched again and compared to the prepared exact document.
 - **Actual on-chain state observed subsequently:** `claim_status(1).last_decision = REVOKE`, `state = REVOKED`, with exact `last_notice_sha256 = revocation_sha256` equal to the pinned notice digest above. The user has now supplied the full `review_notice` transaction hash, and the Studio screenshot marks it **FINALIZED**. Detailed Execution Result and validator consensus history remain separate evidence to capture.
 
+## Successful AI review — transaction details (2026-10-19)
+
+The user provided GenLayer Explorer transaction detail for [review_notice(1)](https://explorer-studio.genlayer.com/tx/0xe4d5c3ea361293152e406326b029ed41234251bdf6c108e8dfa9cd37f0f57624). Its recorded result is FINALIZED, GenVM Execution SUCCESS, Consensus Accepted, Return Value "REVOKE". From: 0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb. To: 0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa. Execution Mode Normal, Initial Validators 5, Rotation Count 0, Value 0 GEN, October 19 2026 5:53:48 PM (Explorer display).
+
+Input: claim_id 1; commit bad26c15ab4a294142545ce2c48f78bbc0a923b5; notice SHA-256 1e6e5862f6fc0fd5a2a3861555eae09497a09f32785bf4711936408353e09388. The visible Equivalence Principle Output 0 shows decision REVOKE and the matching verbatim notice quote. The pasted source-hash field is truncated; the complete notice digest is independently evidenced by the input and claim_status readbacks.
+
+The user-provided Explorer transaction text establishes successful execution and accepted consensus; it does not expose separate outputs from all five initial validators. The Explorer page could not be independently fetched from this environment.
+
 ## Post-revocation verification — user-provided live view readbacks (2026-10-19)
 
 The user provided GenLayer Studio `Call Contract → Response (Accepted)` values for `claim_status(1)` and `claim_status(2)` following the notice review. These are **observed contract view results**, not an independently inspected GenLayer transaction receipt.
@@ -113,7 +121,7 @@ Both records report `chain_id = 61999` and `issuer = 0x4C7cb73aC8F8999af21cfc9fF
 
 **Source display caution:** the user message showed `revocation_url` formatted as a Markdown link; verify the raw Studio value when documenting exact URL bytes. The expected commit-pinned URL from contract code is https://raw.githubusercontent.com/bearbaba/relynx/bad26c15ab4a294142545ce2c48f78bbc0a923b5/notices/aurora-v1.txt.
 
-**Remaining evidence gate:** inspect the linked `review_notice(1)` transaction detail for an explicit **Execution Result** and validator consensus history. A controlled `KEEP` or `INVALID_SCOPE` negative test would strengthen evidence but has not been demonstrated live.
+**Remaining demonstration:** a controlled KEEP or INVALID_SCOPE negative test would strengthen evidence; neither has yet been demonstrated live.
 
 The intended acceptance gates are (i) A/B initially usable, (ii) issuer repo committed a version/claim-bound correction, (iii) GenLayer `REVOKE` resolution actually finalized, (iv) A and dependent B both no longer usable while B itself has not been rewritten, (v) invalid scope or non-revocation notice cannot revoke an unaffected C, (vi) source code/tests/CI green.
 
