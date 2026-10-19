@@ -143,3 +143,13 @@ def test_constructor_rejects_invalid_source_policy(setup):
         c(RELYNX, ISSUER, "fake/../repo", "aurora-")
     with pytest.raises(UserError, match="invalid key prefix"):
         c(RELYNX, ISSUER, "bearbaba/relynx", "../")
+
+
+def test_genvm_runner_header_is_first_two_lines():
+    """Studio v0.2.x requires a version line before the Depends comment."""
+    source = (Path(__file__).resolve().parents[1] /
+              "contracts" / "relynx_consumer_gate.py").read_text(encoding="utf-8")
+    header = source.splitlines()[:2]
+    assert header[0] == "# v0.1.0"
+    assert header[1].startswith('# { "Depends": "py-genlayer:')
+    assert header[1].endswith('" }')

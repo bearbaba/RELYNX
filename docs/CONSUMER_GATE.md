@@ -15,6 +15,19 @@ A **separately deployable** Intelligent Contract, not a replacement for `Relynx`
 
 [`contracts/relynx_consumer_gate.py`](../contracts/relynx_consumer_gate.py), class `RelynxConsumerGate`.
 
+## Studio schema error: `invalid_contract absent_runner_comment`
+
+GenVM 0.2.x expects a **two-line runner header at the very beginning** of the Python source. Earlier consumer revisions omitted the version line; Studio rejected the file **before deployment**. Fixed in the GitHub source:
+
+```python
+# v0.1.0
+# { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
+```
+
+To avoid accidental loss of that header, use the **entire raw Python file** from [consumer gate source](https://raw.githubusercontent.com/bearbaba/RELYNX/main/contracts/relynx_consumer_gate.py), starting with `# v0.1.0`. In Studio create a **new contract file** or replace all contents of any old consumer draft; do not use a stale cached editor tab. Prefer **Add From File** with the downloaded `.py` file. Once Studio loads the schema and shows four constructor fields, provide the values below.
+
+This fix changes only the consumer source header, not RELYNX's deployed code, storage, or past consensus receipts. The regression test guards the first two source lines. A green DirectVM CI run validates compilation/tests; the actual Studio cross-contract call still needs live execution.
+
 ## Constructor (for Studionet instance)
 
 | Parameter | Value |
