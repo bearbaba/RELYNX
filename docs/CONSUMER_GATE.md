@@ -60,9 +60,9 @@ The consumer has now been deployed as an independent contract:
 - **User-provided Explorer receipt:** `FINALIZED`, `GenVM Execution SUCCESS`, `Consensus Accepted`, Normal mode, five initial validators; deployed source includes numeric-ABI constructor normalization.
 - **Original RELYNX remains at** `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`. No redeployment of RELYNX was needed.
 
-The consumer is **deployed**, but runtime interaction with the original RELYNX contract and consumer action receipts still require live read/write tests below. Do not classify cross-contract integration as verified yet.
+**Live integration results:** `policy()` matched, `receipt_count()` was initially 0, `can_act(2)=false`, and `can_act(3)=true`. A user-shared Studio screenshot shows `perform_action(2, "blocked-v1")` reverted with `claim not eligible`, while Explorer shows `perform_action(3, "allowed-v2")` FINALIZED / SUCCESS / returned receipt ID 1. See [Consumer Live Evidence](CONSUMER_LIVE_EVIDENCE.md). The final `receipt_count()` and `receipt(1)` storage reads are still pending.
 
-## Mandatory live acceptance sequence (NOT YET EXECUTED)
+## Mandatory live acceptance sequence (reads and writes observed; receipt storage pending)
 
 1. Read `policy()`, confirm correct RELYNX/issuer/repository/prefix and chain `61999`.
 2. Read `receipt_count()` = `0`.
