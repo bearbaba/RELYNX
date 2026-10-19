@@ -21,6 +21,27 @@ The user supplied two Studio **Call Contract → Response (Accepted)** view resu
 
 These confirm both claims are presently eligible. They do **not yet independently confirm** Claim #2 has `parent_a = 1`, or establish the issuer address. Both must be checked with `claim_status` before building a scope-bound revocation notice. The expected positive-to-negative transition after revocation remains untested.
 
+## Claim #1 — live `claim_status(1)` readback (2026-10-19)
+
+The user supplied the following result from GenLayer Studio `Call Contract → Response (Accepted)`, on the deployed instance. This is an observed read response, not an independently verified transaction receipt.
+
+| Field | Observed value |
+| --- | --- |
+| `claim_id` | `1` |
+| `chain_id` | `61999` |
+| `issuer` | `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb` |
+| `repo` | `bearbaba/relynx` |
+| `key` | `aurora-v1` |
+| `statement` | `Issuer certifies library Aurora v1.0 as compliant with the published integration safety policy.` |
+| `statement_sha256` | `cb26c28fd2056de111ee3970d20d3f50b244285d0a2b8ecf3c257c5bad436213` |
+| `parent_a`, `parent_b` | `0`, `0` |
+| `depth` | `1` |
+| `state` | `ACTIVE` |
+| `can_rely` | `true` |
+| `last_decision`, `last_notice_sha256`, `revocation_url` | Empty strings |
+
+**Next observation needed:** `claim_status(2)`, especially `parent_a = 1`, to establish the dependency before executing any irreversible revocation of Claim #1.
+
 The intended acceptance gates are (i) A/B initially usable, (ii) issuer repo committed a version/claim-bound correction, (iii) GenLayer `REVOKE` resolution actually finalized, (iv) A and dependent B both no longer usable while B itself has not been rewritten, (v) invalid scope or non-revocation notice cannot revoke an unaffected C, (vi) source code/tests/CI green.
 
 When live, attach exact full TX hashes and commit pinned notice URLs, state snapshots, and separate notes about Studio FINALIZED status versus execution result. Do not claim an independently verified Explorer receipt based only on a screenshot.
