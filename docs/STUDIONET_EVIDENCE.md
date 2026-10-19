@@ -121,6 +121,31 @@ Both records report `chain_id = 61999` and `issuer = 0x4C7cb73aC8F8999af21cfc9fF
 
 **Source display caution:** the user message showed `revocation_url` formatted as a Markdown link; verify the raw Studio value when documenting exact URL bytes. The expected commit-pinned URL from contract code is https://raw.githubusercontent.com/bearbaba/relynx/bad26c15ab4a294142545ce2c48f78bbc0a923b5/notices/aurora-v1.txt.
 
+## Claim #3 baseline and non-revocation test source — 2026-10-19
+
+The user supplied an accepted `claim_status(3)` readback from the deployed Studionet instance.
+
+| Field | Observed value |
+| --- | --- |
+| `claim_id` | `3` |
+| `chain_id` | `61999` |
+| `issuer` | `0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb` |
+| `repo`, `key` | `bearbaba/relynx`, `aurora-v2` |
+| `statement` | `Issuer certifies library Aurora v2.0 as compliant with the published integration safety policy.` |
+| `statement_sha256` | `87533fb191260ad538cf1d17b22e7da6220de40bf3391e3307ee644ff77b4d2a` |
+| `parent_a`, `parent_b`, `depth` | `0`, `0`, `1` |
+| `state`, `can_rely` | **`ACTIVE`**, **`true`** |
+| `last_decision`, `revocation_sha256` | Empty strings |
+
+A synthetic, explicit **non-revocation** notice for independent Claim #3 was created, committed and checked against the exact source content at its pinned commit. This does **not** represent a genuine external certificate.
+
+- GitHub source: https://raw.githubusercontent.com/bearbaba/relynx/1cbd8ccbd5d5a7163c33d6864adf3196e38d9968/notices/aurora-v2.txt
+- `commit`: `1cbd8ccbd5d5a7163c33d6864adf3196e38d9968`
+- `notice_sha256`: `7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260` (425 UTF-8 bytes, no trailing newline)
+- Intent: assert Aurora v2.0 certification remains valid, explicitly differentiate it from the revoked Aurora v1.0 certificate
+- **Next live write:** `review_notice(3, "1cbd8ccbd5d5a7163c33d6864adf3196e38d9968", "7070b2a97dc9a59a51d9065316af0dece61114a77e33bfb8fa451bca977da260")`.
+- **Expected but NOT YET OBSERVED:** comparative consensus returns `KEEP`; Claim #3 stays `ACTIVE` with `can_rely(3)=true`. An accepted `KEEP` receipt and follow-up `claim_status(3)` are required to prove the negative scenario.
+
 **Remaining demonstration:** a controlled KEEP or INVALID_SCOPE negative test would strengthen evidence; neither has yet been demonstrated live.
 
 The intended acceptance gates are (i) A/B initially usable, (ii) issuer repo committed a version/claim-bound correction, (iii) GenLayer `REVOKE` resolution actually finalized, (iv) A and dependent B both no longer usable while B itself has not been rewritten, (v) invalid scope or non-revocation notice cannot revoke an unaffected C, (vi) source code/tests/CI green.
