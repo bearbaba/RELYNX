@@ -1,6 +1,7 @@
 import "./style.css";
-import { createClient, isSuccessful } from "genlayer-js";
-import { studionet } from "genlayer-js/chains";
+import { createClient } from "genlayer-stable";
+import { studionet } from "genlayer-stable/chains";
+import { TransactionStatus, ExecutionResult } from "genlayer-stable/types";
 
 const RELYNX = "0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa";
 const GATE = "0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b";
@@ -142,9 +143,26 @@ async function connectWallet(){
  try {
   const accounts=await provider.request({method:"eth_requestAccounts"});
   if(!accounts?.[0])throw new Error("Wallet did not return an account");
-  const candidate=createClient({chain:studionet,account:accounts[0],provider});
-  await candidate.connect("studionet");
-  wallet=candidate;account=accounts[0];
+  const expected="0x"+studionet.id.toString(16);
+  let current=await provider.request({method:"eth_chainId"});
+  if (String(current).toLowerCase()!==expected.toLowerCase()) {
+    try {
+      await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:expected}]});
+    } catch (switchError) {
+      if (switchError?.code!==4902) throw switchError;
+      await provider.request({method:"wallet_addEthereumChain",params:[{
+        chainId:expected,chainName:"GenLayer Studionet",
+        rpcUrls:studionet.rpcUrls.default.http,
+        nativeCurrency:studionet.nativeCurrency,
+        blockExplorerUrls:[studionet.blockExplorers.default.url]
+      }]});
+      await provider.request({method:"wallet_switchEthereumChain",params:[{chainId:expected}]});
+    }
+    current=await provider.request({method:"eth_chainId"});
+    if(String(current).toLowerCase()!==expected.toLowerCase()) throw new Error("Wallet is not on GenLayer Studionet");
+  }
+  wallet=createClient({chain:studionet,account:accounts[0],provider});
+  account=accounts[0];
   $("walletState").textContent=short(account);button.textContent="Disconnect";
   tx("Wallet connected","Connected as "+short(account)+". GenLayer Studionet · 61999.");
  }catch(error){
@@ -158,22 +176,23 @@ async function write(address,functionName,args){
  locked=true;latestHash=null;updateSignButton();
  const request={address,functionName,args};
  try {
-  tx("Preparing transaction","Checking fees before requesting your wallet signature…");
-  const fees=await wallet.estimateTransactionFeesForWrite(request);
-  tx("Confirm in wallet","Check your wallet popup and approve only if the details are correct.");
-  const hash=await wallet.writeContract({...request,fees:{distribution:fees.distribution,feeValue:fees.feeValue}});
-  latestHash=hash;tx("Submitted to GenLayer","Waiting for finalization; do not submit a duplicate.",hash);
+  tx("Confirm in wallet","Review the transaction in your wallet. No duplicate submission.");
+  const hash=await wallet.writeContract({...request,value:0n});
+  latestHash=hash;tx("Submitted to GenLayer","Waiting for a finalized result. Do not submit again.",hash);
   let receipt;
-  try{receipt=await reader.waitForFinalization({hash});}
+  try{receipt=await reader.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});}
   catch(error){
-   tx("Transaction submitted · status unknown","The transaction hash exists but finality could not be confirmed: "+errText(error)+". Check Explorer; do not sign again.",hash);
+   tx("Submitted · finality not verified","Transaction was sent, but finalization could not be checked: "+errText(error)+". Inspect Explorer before retrying.",hash);
    return;
   }
-  if(!isSuccessful(receipt)){
-   tx("Execution rolled back","Transaction finalized but GenVM did not return success. "+(receipt.txExecutionResultName||receipt.statusName||"")+" · inspect Explorer.",hash);
+  const succeeded=receipt.statusName===TransactionStatus.FINALIZED &&
+    receipt.txExecutionResultName===ExecutionResult.FINISHED_WITH_RETURN;
+  if(!succeeded){
+   tx("Transaction not successful","Finalized status: "+String(receipt.statusName||"unknown")+
+     " · execution: "+String(receipt.txExecutionResultName||"unknown")+". Review Explorer.",hash);
    return;
   }
-  tx("Transaction successful","Finalized and executed successfully. Reloading state and receipt…",hash);
+  tx("Transaction successful","FINALIZED and GenVM SUCCESS. Refreshing claim and receipt state…",hash);
   await refresh();
   if(functionName==="perform_action"){
     await checkGate();
