@@ -193,7 +193,7 @@ async function checkStored(record){
    const receipt=toObject(await read(GATE,"receipt",[i]));
    if(Number(receipt.claim_id)===Number(id)&&receipt.action_key===key&&
       String(receipt.actor).toLowerCase()===String(record.actor).toLowerCase()){
-    return {ok:true,message:"Receipt #"+i+" is stored on-chain for Claim #"+id+" · "+key+"."};
+    return {ok:true,id:i,message:"Receipt #"+i+" is stored on-chain for Claim #"+id+" · "+key+"."};
    }
   }
   return {ok:false,message:"Action receipt not visible yet. Recheck this hash, not a second signature."};
@@ -204,7 +204,7 @@ async function checkStored(record){
    const c=toObject(await read(RELYNX,"claim_status",[i]));
    if(c.key===record.args[2]&&c.statement===record.args[3]&&
       String(c.issuer).toLowerCase()===String(record.actor).toLowerCase()){
-    return {ok:true,message:"Claim #"+i+" was registered and verified on-chain."};
+    return {ok:true,id:i,message:"Claim #"+i+" was registered and verified on-chain."};
    }
   }
   return {ok:false,message:"Registered claim not visible yet. Recheck the existing transaction hash."};
@@ -251,7 +251,18 @@ async function watchPending(record){
        if(recordCheck.ok){
         clearPending();
         tx("Transaction successful",recordCheck.message,hash,"success","FINALIZED / SUCCESS");
-        try{await refresh();}catch{}
+        try{
+         await refresh();
+         if(record.functionName==="register_claim"&&recordCheck.id){
+          await loadClaim(recordCheck.id);
+          $("gateCustomId").value=String(recordCheck.id);
+          setGateChoice(recordCheck.id);
+          document.querySelector("#claims")?.scrollIntoView({behavior:"smooth",block:"start"});
+         }else if(record.functionName==="perform_action"){
+          await checkGate();
+          document.querySelector("#gate")?.scrollIntoView({behavior:"smooth",block:"start"});
+         }
+        }catch{}
        }else{
         tx("Finalized · verifying record",recordCheck.message,hash,"unknown","FINALIZED / READBACK PENDING");
        }
@@ -311,6 +322,12 @@ $("preset2").onclick=()=>loadClaim(2);
 $("preset3").onclick=()=>loadClaim(3);
 $("choose2").onclick=()=>setGateChoice(2);
 $("choose3").onclick=()=>setGateChoice(3);
+$("chooseCustom").onclick=()=>{
+ const id=Number($("gateCustomId").value);
+ if(!Number.isSafeInteger(id)||id<1){tx("Invalid claim ID","Enter a positive claim ID from the chain.",null,"error");return;}
+ setGateChoice(id);
+ loadClaim(id);
+};
 $("connectWallet").onclick=connectWallet;
 $("dismissTx").onclick=()=>{if($("txPanel").dataset.state!=="working")$("txPanel").hidden=true;};
 $("checkTx").onclick=()=>{const existing=getPending();if(existing&&!locked)watchPending(existing);};
