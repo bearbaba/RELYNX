@@ -363,7 +363,17 @@ $("actionForm").onsubmit=async e=>{
 $("registerForm").onsubmit=e=>{
  e.preventDefault();
  const args=[$("repoOwner").value.trim(),$("repoName").value.trim(),$("claimKey").value.trim(),$("claimStatement").value.trim(),Number($("parentA").value),Number($("parentB").value)];
- if(args[3].length<32){tx("Invalid claim","Statement must be at least 32 characters.");return;}
+ if(args[3].length<32){tx("Invalid claim","Statement must be at least 32 characters.",null,"error");return;}
+ if(args[0]!=="bearbaba"||args[1]!=="relynx"||!args[2].startsWith("aurora-")){
+  tx("Consumer Gate demo policy mismatch","For the complete sign-and-receipt demo, use bearbaba / relynx and a Claim Key starting with aurora-. Nothing has been sent.",null,"error");
+  return;
+ }
+ const trustedIssuer="0x4C7cb73aC8F8999af21cfc9fF4cF2333a9508Dcb";
+ if(account&&account.toLowerCase()!==trustedIssuer.toLowerCase()){
+  tx("Different issuer wallet","The current Consumer Gate trusts a different issuer wallet. Switch to the existing demo issuer to create a claim eligible for a follow-up action.",null,"error");
+  return;
+ }
+ $("claimJourney").hidden=true;
  write(RELYNX,"register_claim",args);
 };
 $("noticeForm").onsubmit=e=>{
