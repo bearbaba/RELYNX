@@ -4,6 +4,13 @@
 
 **RELYNX is a standalone GenLayer Intelligent Contract for revoking issuer-controlled attestations and automatically invalidating dependent trust.** It is a reusable primitive, not an app or a token product.
 
+## New companion application: RELYNX Console (GenLayer Projects submission, Oct 30 2026)
+
+**[Open the live RELYNX Console](https://relynx-console.vercel.app/)** · **[Watch the signed-wallet demonstration](https://youtu.be/TzSONW6uWb0)** · **[Read the separate Project reviewer guide](apps/relynx-console/PROJECT_REVIEWER.md)** · **[Frontend source](apps/relynx-console/)**
+
+The original RELYNX contract was submitted separately as an Intelligent Contract contribution. **RELYNX Console is a distinct subsequent web app** built on that contract and the separately deployed Consumer Gate. It adds wallet registration, read-only trust exploration, cross-contract action checks, guided signing, finality tracking and persistent receipt verification. The new October 30 video demonstrates Claim #4 registration and Consumer Gate Receipt #2; historical `REVOKE` and `KEEP` AI-consensus decisions are evidenced by the linked Explorer transactions, not claimed as new Claim #4 AI judgments. This app is experimental, testnet-only and not an audited open community authorization service. See the reviewer guide for verification and limitations.
+
+
 A registered issuer wallet asserts a claim and chooses its public GitHub notice repository. Any reviewer may present an immutable, commit-pinned notice **from that pre-registered repository**. Independent GenLayer validators fetch and hash the notice and comparatively reason about whether it *explicitly withdraws that exact claim*. If they agree on `REVOKE`, the claim becomes irrevocably `REVOKED`. Any dependent claim instantly fails `can_rely()` without rewriting dependent storage.
 
 ## Why GenLayer matters
