@@ -1,6 +1,6 @@
 # RELYNX Console (Project candidate)
 
-**Status (30 October 2026):** Vite production build returned READY on Vercel staging. Browser/RPC and signed wallet acceptance have **not yet been independently verified**. This is a new GenLayer Project application, separate from the already accepted RELYNX Intelligent Contract contribution. **Do not submit to Project Explorer before a public HTTPS preview has passed actual signed browser testing.**
+**Status (30 October 2026):** Vercel production build READY. Stable Studionet RPC reads have been **independently verified from the public Vercel API**: `claim_count=3`, `receipt_count=1`, `can_act(2)=false`, `can_act(3)=true`, and live `claim_status`/`receipt(1)` values. **A fresh browser wallet signature and live write still require builder acceptance.** This is a new GenLayer Project application, separate from the already accepted RELYNX Intelligent Contract contribution. **Do not submit to Project Explorer before a public HTTPS preview has passed actual signed browser testing.**
 
 ## Run locally
 
@@ -35,19 +35,20 @@ Vercel Vite project root: `apps/relynx-console`. Node 22. The application connec
 
 ## Limitations
 
-- The browser needs working RPC access to Studionet; network resets and website content drift can break historic demo state.
+- Read-only calls go through `api/read.js` (allowlisted, read-only, `LATEST_FINAL`) with the stable `genlayer-js@1.1.8` SDK. This corrects the previous `gen_call` Version failure encountered with `genlayer-js@2.0.0-rc.2` on Studionet. Network changes can still break reads.
 - Wallet extension required for writes. Contract claims are issuer assertions, not universal identity proofs.
-- SDK pinned to `genlayer-js@2.0.0-rc.2` and must be retested against the deployed Studionet after every SDK upgrade.
-- Fee simulations may be costly or fail for expected reverts; never bypass a failed estimate silently.
+- Stable network path uses the `genlayer-stable` npm alias for `genlayer-js@1.1.8` in both browser wallet and server API. `genlayer-js@2.0.0-rc.2` remains as a transitional dependency but is not imported in current frontend/API paths. Avoid mixing these incompatible network release families.
+- The stable Studionet write client sends `value: 0n` and waits for `TransactionStatus.FINALIZED`; successful execution additionally requires `FINISHED_WITH_RETURN`. Verify the wallet signature on the actual Studio-compatible provider before filming. Never retry a transaction automatically when its submitted hash exists.
 - A denied transaction can be FINALIZED but execute with ERROR. UI must distinguish these states.
 - Existing RELYNX Consumer Gate stores **demo action receipts**, not payments or actual authorization to external resources.
 
 ## Before GenLayer Projects submission
 
 - [ ] Vercel preview build READY + public accessibility
-- [ ] Live finalized reads of claim #1, #2, #3 and stored action receipt #1
+- [x] External live API reads of claim #2 and #3, both eligibility checks, counters and receipt #1; Claim #1 source revocation evidenced in existing transaction ledger (browser rendering still needs smoke test)
 - [ ] Wallet connect/sign on actual Studio-compatible wallet
-- [ ] Invalid claim action shown as BLOCKED; valid claim write finalized SUCCESS
+- [x] Consumer Gate live read `can_act(2)=false`, `can_act(3)=true`
+- [ ] Fresh signed Consumer Gate action from web UI finalized SUCCESS and persisted as a new receipt
 - [ ] Claim register/review working for a fresh demo claim, with accurately pinned source digest
 - [ ] Browser error and disconnection regression checks
 - [ ] One concise screen recording with reproducible How-to, not re-used IC evidence alone
