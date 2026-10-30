@@ -37,7 +37,11 @@ async function read(address,functionName,args=[]) {
   const body=await response.json();
   if(!response.ok)throw new Error(body?.error||"HTTP "+response.status);
   return body.value;
- }catch(error){throw new Error("Studionet read failed (direct: "+errText(directError).slice(0,120)+"; fallback: "+errText(error).slice(0,120)+")");}
+ }catch(error){
+  const detail=errText(directError)+"; "+errText(error);
+  if(/execution failed Version|failed Version/i.test(detail))throw new Error("GenLayer RPC cannot execute contract reads (Version error). Check the same method in GenLayer Studio.");
+  throw new Error("GenLayer contract read failed. Verify network or try again.");
+ }
 }
 function highlightClaim(id){$("preset2").classList.toggle("active",id===2);$("preset3").classList.toggle("active",id===3);$("claimId").value=String(id);}
 function setGateChoice(id){
