@@ -33,6 +33,11 @@
     <div id="claimDetails" class="claim-details" aria-live="polite"><div class="empty"><div class="empty-icon">◇</div><b>Select a claim</b><p>We'll read its current status directly from GenLayer.</p></div></div>
    </div>
   </section>
+  <section id="claimJourney" class="journey-success" hidden aria-live="polite">
+   <div><strong id="claimJourneyTitle">Claim registered successfully</strong>
+    <p>Next, check this claim in the Consumer Gate before signing an action.</p></div>
+   <button id="continueGate" class="btn primary" type="button">Continue: Check &amp; Sign →</button>
+  </section>
   <section id="gate" class="panel">
    <div class="section-top"><div><span class="eyebrow">02 / CONSUMER GATE</span><h2>Check. Sign. Verify.</h2><p>A second contract checks current trust before recording an action.</p></div></div>
    <div class="gate-grid">
@@ -71,7 +76,8 @@
    <div class="tx-copy"><div id="txStage" class="eyebrow">STEP 1 / WALLET</div><h3 id="txTitle">Confirm in wallet</h3><p id="txStatus">Waiting for your signature…</p></div>
   </div>
   <div class="tx-foot"><a id="txLink" target="_blank" rel="noopener" hidden>View transaction in Explorer ↗</a>
-  <button id="checkTx" class="btn tiny" type="button" hidden>Check transaction again</button></div>
+  <button id="checkTx" class="btn tiny" type="button" hidden>Check transaction again</button>
+  <button id="nextSign" class="btn primary tiny" type="button" hidden>Next: Check &amp; Sign →</button></div>
  </div>
 <script type="module" src="/src/main.js"></script>
 </body></html>
