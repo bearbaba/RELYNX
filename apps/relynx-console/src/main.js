@@ -1,14 +1,12 @@
 import "./style.css";
 import { createClient, isSuccessful } from "genlayer-js";
 import { studionet } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
 
 const RELYNX = "0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa";
 const GATE = "0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b";
 const EXPLORER = "https://explorer-studio.genlayer.com/tx/";
 const reader = createClient({chain:studionet});
 const $ = id => document.getElementById(id);
-const finalState = TransactionHashVariant.LATEST_FINAL;
 let wallet = null, account = null, selected = 2, gateClaim = 3, gateAllowed = false;
 let locked = false, latestHash = null, refreshToken = 0;
 const toObject = v => typeof v === "string" ? JSON.parse(v) : v;
@@ -24,24 +22,15 @@ function tx(title,description,hash) {
 }
 function knownScope(address){return address===RELYNX?"relynx":address===GATE?"gate":null;}
 async function read(address,functionName,args=[]) {
- let directError=null;
- try {
-  return await reader.readContract({address,functionName,args,transactionHashVariant:finalState});
- } catch(error) {directError=error;}
  const scope=knownScope(address);
- if(!scope)throw directError;
+ if (!scope) throw new Error("Unsupported contract address");
  const query=new URLSearchParams({scope,method:functionName});
  if(args.length)query.set("id",String(args[0]));
- try {
-  const response=await fetch("/api/read?"+query.toString(),{cache:"no-store"});
-  const body=await response.json();
-  if(!response.ok)throw new Error(body?.error||"HTTP "+response.status);
-  return body.value;
- }catch(error){
-  const detail=errText(directError)+"; "+errText(error);
-  if(/execution failed Version|failed Version/i.test(detail))throw new Error("GenLayer RPC cannot execute contract reads (Version error). Check the same method in GenLayer Studio.");
-  throw new Error("GenLayer contract read failed. Verify network or try again.");
- }
+ const response=await fetch("/api/read?"+query.toString(),{cache:"no-store"});
+ let body;
+ try{body=await response.json();}catch{throw new Error("Unexpected read service response");}
+ if(!response.ok)throw new Error(body?.error||("Read service returned HTTP "+response.status));
+ return body.value;
 }
 function highlightClaim(id){$("preset2").classList.toggle("active",id===2);$("preset3").classList.toggle("active",id===3);$("claimId").value=String(id);}
 function setGateChoice(id){
