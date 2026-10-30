@@ -1,6 +1,6 @@
-import { createClient } from "genlayer-js";
-import { studionet } from "genlayer-js/chains";
-import { TransactionHashVariant } from "genlayer-js/types";
+import { createClient } from "genlayer-stable";
+import { studionet } from "genlayer-stable/chains";
+import { TransactionHashVariant } from "genlayer-stable/types";
 
 const client = createClient({ chain: studionet });
 const CONTRACTS = {
