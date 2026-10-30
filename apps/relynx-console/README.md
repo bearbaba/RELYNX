@@ -1,6 +1,6 @@
 # RELYNX Console (Project candidate)
 
-**Status (30 October 2026):** Vercel production build READY. Stable Studionet RPC reads have been **independently verified from the public Vercel API**: `claim_count=3`, `receipt_count=1`, `can_act(2)=false`, `can_act(3)=true`, and live `claim_status`/`receipt(1)` values. **A fresh browser wallet signature and live write still require builder acceptance.** This is a new GenLayer Project application, separate from the already accepted RELYNX Intelligent Contract contribution. **Do not submit to Project Explorer before a public HTTPS preview has passed actual signed browser testing.**
+**Status (30 October 2026):** Live on Vercel production with newly recorded signed browser transactions in [the October 30 demo](https://youtu.be/TzSONW6uWb0). The public Vercel API was independently re-read after the video: **`claim_count()=4`, `can_act(4)=true`, `receipt(2)` matches Claim #4 and the submitting wallet**. The current total receipt count is 3 (an additional receipt reuses the same action key). This is a **new GenLayer Project web app** that builds on an earlier accepted standalone Intelligent Contract contribution; it is not a re-submission of that IC. See [Project Reviewer Guide](PROJECT_REVIEWER.md).
 
 ## Run locally
 
@@ -9,11 +9,11 @@ npm install
 npm run dev
 ```
 
-## Preview deployment
+## Deployment
 
 [Open the staging build](https://relynx-console-e8ikrrxwk-khaiptk1998-8088s-projects.vercel.app/) (Vercel Authentication may require team login).
 
-Vercel project: `relynx-console` in team `khaiptk1998-8088s-projects`. Git is connected to `bearbaba/RELYNX`; frontend root directory is `apps/relynx-console`. The staging build was deployed from exact GitHub source files, and future repo builds use the configured root. The staging build has **not** passed live browser signing checks, and the site is not yet a public Project Explorer submission.
+Vercel project: `relynx-console` in team `khaiptk1998-8088s-projects`. Git is connected to `bearbaba/RELYNX`; frontend root directory is `apps/relynx-console`. The staging build was deployed from exact GitHub source files, and future repo builds use the configured root. Production is available at **https://relynx-console.vercel.app/**. The signed demo and current API readbacks are documented in the Project Reviewer Guide; the old staging link is retained for historical reference.
 
 ## Deploy
 
@@ -44,14 +44,15 @@ Vercel Vite project root: `apps/relynx-console`. Node 22. The application connec
 
 ## Before GenLayer Projects submission
 
-- [ ] Vercel preview build READY + public accessibility
+- [x] Public production Vercel deployment READY
 - [x] External live API reads of claim #2 and #3, both eligibility checks, counters and receipt #1; Claim #1 source revocation evidenced in existing transaction ledger (browser rendering still needs smoke test)
-- [ ] Wallet connect/sign on actual Studio-compatible wallet
+- [x] Actual browser wallet connect + signed Claim #4 and Consumer Gate action shown in the new demo video
 - [x] Consumer Gate live read `can_act(2)=false`, `can_act(3)=true`
-- [ ] Fresh signed Consumer Gate action from web UI finalized SUCCESS and persisted as a new receipt
-- [ ] Claim register/review working for a fresh demo claim, with accurately pinned source digest
+- [x] Fresh signed Consumer Gate action from web UI stored as `receipt(2)` for Claim #4; transaction success and read-back shown in video
+- [x] Fresh Claim #4 registered from browser and independently verified; this registration alone is not an AI notice-review verdict
+- [ ] Fresh notice review on a new pinned source (historic REVOKE / KEEP verdicts are documented)
 - [ ] Browser error and disconnection regression checks
-- [ ] One concise screen recording with reproducible How-to, not re-used IC evidence alone
-- [ ] New Project Explorer listing, distinct from standalone RELYNX submission
+- [x] New [subtitled signed-wallet screen recording](https://youtu.be/TzSONW6uWb0) with new Claim #4 and Receipt #2
+- [ ] New Project Explorer listing, distinct from standalone RELYNX submission (requires Portal submission)
 
 See source RELYNX contract repo [root README](../../README.md) and [consumer live evidence](../../docs/CONSUMER_LIVE_EVIDENCE.md).
