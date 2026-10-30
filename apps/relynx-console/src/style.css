@@ -38,3 +38,10 @@
 .tx-panel .tx-close{top:7px;right:8px}
 @media(max-width:620px){.tx-panel{right:14px;bottom:14px;max-width:calc(100vw - 28px)}}
 @media(prefers-reduced-motion:reduce){.tx-spinner{animation-duration:2s}}
+
+/* A fresh claim can be used without hardcoded demo IDs. */
+.new-claim-picker{margin-top:12px;border-top:1px solid #283c45;padding-top:13px}
+.new-claim-picker label{display:block;font-weight:800;letter-spacing:.1em;font-size:10px;color:#99abb2;margin-bottom:8px}
+.new-claim-picker .input-row{display:flex;align-items:center;gap:8px}
+.new-claim-picker input{width:105px;flex:none}
+.new-claim-picker .btn{white-space:nowrap}
