@@ -14,7 +14,14 @@ export default async function handler(req, res) {
   if(!transaction)return res.status(200).json({found:false});
   const status=transaction.statusName??String(transaction.status??"UNKNOWN");
   const execution=transaction.txExecutionResultName??null;
-  return res.status(200).json({found:true,status,execution});
+  const consensus=transaction.consensus_data??transaction.consensusData??{};
+  const leader=consensus.leader_receipt??consensus.leaderReceipt??null;
+  const leaderResults=(Array.isArray(leader)?leader:[leader]).filter(Boolean).slice(0,3).map(x=>({
+   execution_result:x.execution_result??x.executionResult??null,
+   genvm_result:x.genvm_result??x.genvmResult??null,
+   result_code:x.result?.code??null
+  }));
+  return res.status(200).json({found:true,status,execution,leaderResults,keys:Object.keys(transaction).filter(k=>/execution|receipt|consensus|result/i.test(k)).slice(0,20)});
  }catch(e){
   return res.status(502).json({error:e instanceof Error?e.message.slice(0,200):"Transaction RPC lookup failed"});
  }
