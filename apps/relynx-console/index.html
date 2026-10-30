@@ -3,25 +3,15 @@
 <title>RELYNX — Trust Console</title><meta name="description" content="Explore on-chain claims, check trust and record GenLayer action receipts."/>
 </head><body>
 <div class="layout">
- <aside class="side">
-  <a class="brand" href="#top"><span class="brand-icon">R<span>·</span></span><span>RELYNX<small>TRUST CONSOLE</small></span></a>
-  <div class="side-group"><span class="side-caption">WORKSPACE</span>
-    <a href="#claims" class="nav-link active">Claims</a>
-    <a href="#gate" class="nav-link">Consumer Gate</a>
-    <a href="#issuer" class="nav-link">Issuer tools</a>
-    <a href="#evidence" class="nav-link">Evidence</a>
-  </div>
-  <div class="side-foot"><span class="dot"></span><div><b>GenLayer Studionet</b><small>Chain ID 61999 · Testnet</small></div></div>
- </aside>
  <main class="main" id="top">
+  <div class="masthead"><a class="brand" href="#top" aria-label="RELYNX home"><span class="brand-icon">R<span>·</span></span><span>RELYNX<small>TRUST CONSOLE</small></span></a><div class="mast-right"><span class="network">● &nbsp; Studionet · 61999</span><span id="walletState" class="wallet-info">Read-only mode</span><button class="btn outline" id="connectWallet" type="button">Connect wallet</button></div></div>
   <header class="top">
-   <div><div class="eyebrow">GENLAYER / LIVE CONTRACTS</div><h1>Know which claims<br/><em>you can trust.</em></h1>
-    <p>Explore a claim, check its current eligibility, and see the decision enforced by an on-chain Consumer Gate.</p>
+   <div><div class="eyebrow">GENLAYER / LIVE CONTRACTS</div><h1>Check what you can<br/><em>still trust.</em></h1>
+    <p>One claim can affect another. See what GenLayer allows and what it blocks.</p>
    </div>
-   <div class="wallet"><div class="wallet-info" id="walletState">Read-only mode</div>
-   <button class="btn outline" id="connectWallet" type="button">Connect wallet</button></div>
+
   </header>
-  <div class="top-action"><a href="#claims" class="btn primary">Explore claims <span>↗</span></a><a href="#gate" class="btn outline">Try Consumer Gate</a></div>
+  <div class="top-action"><a href="#claims" class="btn primary">View claims ↓</a><a href="#gate" class="btn outline">Check an action ↓</a></div>
   <section class="overview" aria-label="Live counters">
    <div class="metric"><span>ON-CHAIN CLAIMS</span><strong id="claimCount">Loading…</strong><small>RELYNX</small></div>
    <div class="metric"><span>STORED RECEIPTS</span><strong id="receiptCount">Loading…</strong><small>Consumer Gate</small></div>
