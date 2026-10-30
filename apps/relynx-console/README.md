@@ -37,7 +37,7 @@ Vercel Vite project root: `apps/relynx-console`. Node 22. The application connec
 
 - Read-only calls go through `api/read.js` (allowlisted, read-only, `LATEST_FINAL`) with the stable `genlayer-js@1.1.8` SDK. This corrects the previous `gen_call` Version failure encountered with `genlayer-js@2.0.0-rc.2` on Studionet. Network changes can still break reads.
 - Wallet extension required for writes. Contract claims are issuer assertions, not universal identity proofs.
-- Stable network path uses the `genlayer-stable` npm alias for `genlayer-js@1.1.8` in both browser wallet and server API. `genlayer-js@2.0.0-rc.2` remains as a transitional dependency but is not imported in current frontend/API paths. Avoid mixing these incompatible network release families.
+- Both browser wallet and server API use `genlayer-stable`, pinned to `genlayer-js@1.1.8`. The incompatible `genlayer-js@2.0.0-rc.2` prerelease is no longer a dependency. Keep the Studionet release family consistent.
 - The stable Studionet write client sends `value: 0n` and waits for `TransactionStatus.FINALIZED`; successful execution additionally requires `FINISHED_WITH_RETURN`. Verify the wallet signature on the actual Studio-compatible provider before filming. Never retry a transaction automatically when its submitted hash exists.
 - A denied transaction can be FINALIZED but execute with ERROR. UI must distinguish these states.
 - Existing RELYNX Consumer Gate stores **demo action receipts**, not payments or actual authorization to external resources.
