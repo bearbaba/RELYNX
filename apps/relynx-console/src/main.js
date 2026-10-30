@@ -24,6 +24,7 @@ function tx(title,description,hash=null,state="info",stage="TRANSACTION STATUS")
  if(hash)$("txLink").href=EXPLORER+hash;
  $("dismissTx").hidden=state==="working";
  $("checkTx").hidden=state!=="unknown"||!hash;
+ $("nextSign").hidden=true;
 }
 function knownScope(address){return address===RELYNX?"relynx":address===GATE?"gate":null;}
 async function read(address,functionName,args=[]) {
@@ -257,7 +258,12 @@ async function watchPending(record){
           await loadClaim(recordCheck.id);
           $("gateCustomId").value=String(recordCheck.id);
           setGateChoice(recordCheck.id);
-          document.querySelector("#claims")?.scrollIntoView({behavior:"smooth",block:"start"});
+          if($("actionKey").value==="reviewer-demo")$("actionKey").value="relynx-video-"+recordCheck.id+"-01";
+          $("claimJourney").hidden=false;
+          $("claimJourney").dataset.claimId=String(recordCheck.id);
+          $("claimJourneyTitle").textContent="Claim #"+recordCheck.id+" registered successfully";
+          $("nextSign").hidden=false;
+          document.querySelector("#claimJourney")?.scrollIntoView({behavior:"smooth",block:"center"});
          }else if(record.functionName==="perform_action"){
           await checkGate();
           document.querySelector("#gate")?.scrollIntoView({behavior:"smooth",block:"start"});
@@ -331,6 +337,19 @@ $("chooseCustom").onclick=()=>{
 $("connectWallet").onclick=connectWallet;
 $("dismissTx").onclick=()=>{if($("txPanel").dataset.state!=="working")$("txPanel").hidden=true;};
 $("checkTx").onclick=()=>{const existing=getPending();if(existing&&!locked)watchPending(existing);};
+async function continueAfterClaim(){
+ const id=Number($("claimJourney").dataset.claimId);
+ if(!Number.isSafeInteger(id)||id<1){tx("No new claim selected","Create and finalize a claim first.",null,"error");return;}
+ setGateChoice(id);
+ $("gateCustomId").value=String(id);
+ document.querySelector("#gate")?.scrollIntoView({behavior:"smooth",block:"start"});
+ await checkGate();
+ if(!gateAllowed){
+  $("claimJourney").querySelector("p").textContent="Consumer Gate blocked the new claim. Check the trusted issuer, repository and aurora- claim key policy; do not sign.";
+ }
+}
+$("nextSign").onclick=continueAfterClaim;
+$("continueGate").onclick=continueAfterClaim;
 $("checkAction").onclick=checkGate;
 $("actionForm").onsubmit=async e=>{
  e.preventDefault();
