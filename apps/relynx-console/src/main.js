@@ -1,12 +1,10 @@
 import "./style.css";
 import { createClient } from "genlayer-stable";
 import { studionet } from "genlayer-stable/chains";
-import { TransactionStatus, ExecutionResult } from "genlayer-stable/types";
 
 const RELYNX = "0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa";
 const GATE = "0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b";
 const EXPLORER = "https://explorer-studio.genlayer.com/tx/";
-const reader = createClient({chain:studionet});
 const $ = id => document.getElementById(id);
 let wallet = null, account = null, selected = 2, gateClaim = 3, gateAllowed = false;
 let locked = false, latestHash = null, refreshToken = 0;
@@ -16,10 +14,16 @@ const errText = e => e instanceof Error ? e.message : String(e);
 function element(tag,text,cls){ const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
 function pair(container,label,value){container.append(element("dt",label),element("dd",value===undefined||value===null?"—":value));}
 function setRead(text,kind=""){ $("readStatus").textContent=text;$("readNotice").className="notice "+kind; }
-function tx(title,description,hash) {
- $("txPanel").hidden=false;$("txTitle").textContent=title;$("txStatus").textContent=description;
+function tx(title,description,hash=null,state="info",stage="TRANSACTION STATUS") {
+ const panel=$("txPanel");panel.hidden=false;panel.dataset.state=state;
+ $("txTitle").textContent=title;$("txStatus").textContent=description;$("txStage").textContent=stage;
+ $("txSpinner").hidden=state!=="working";
+ $("txMark").hidden=state==="working";
+ $("txMark").textContent=state==="success"?"✓":state==="error"?"×":state==="unknown"?"!":"i";
  $("txLink").hidden=!hash;
  if(hash)$("txLink").href=EXPLORER+hash;
+ $("dismissTx").hidden=state==="working";
+ $("checkTx").hidden=state!=="unknown"||!hash;
 }
 function knownScope(address){return address===RELYNX?"relynx":address===GATE?"gate":null;}
 async function read(address,functionName,args=[]) {
@@ -170,36 +174,133 @@ async function connectWallet(){
   tx("Wallet connection failed",errText(error));
  }finally{button.disabled=false;updateSignButton();}
 }
+const TX_STORAGE="relynx.studionet.pending-tx.v2";
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+let activePoll=false;
+function getPending(){
+ try{
+  const value=JSON.parse(sessionStorage.getItem(TX_STORAGE)||"null");
+  return value&&/^0x[0-9a-fA-F]{64}$/.test(value.hash)&&Array.isArray(value.args)?value:null;
+ }catch{return null;}
+}
+function clearPending(){try{sessionStorage.removeItem(TX_STORAGE);}catch{}}
+function savePending(record){try{sessionStorage.setItem(TX_STORAGE,JSON.stringify(record));}catch{}}
+async function checkStored(record){
+ const [id,key]=record.args;
+ if(record.functionName==="perform_action"){
+  const n=Number(await read(GATE,"receipt_count"));
+  for(let i=n;i>=Math.max(1,n-7);i--){
+   const receipt=toObject(await read(GATE,"receipt",[i]));
+   if(Number(receipt.claim_id)===Number(id)&&receipt.action_key===key&&
+      String(receipt.actor).toLowerCase()===String(record.actor).toLowerCase()){
+    return {ok:true,message:"Receipt #"+i+" is stored on-chain for Claim #"+id+" · "+key+"."};
+   }
+  }
+  return {ok:false,message:"Action receipt not visible yet. Recheck this hash, not a second signature."};
+ }
+ if(record.functionName==="register_claim"){
+  const n=Number(await read(RELYNX,"claim_count"));
+  for(let i=n;i>=Math.max(1,n-7);i--){
+   const c=toObject(await read(RELYNX,"claim_status",[i]));
+   if(c.key===record.args[2]&&c.statement===record.args[3]&&
+      String(c.issuer).toLowerCase()===String(record.actor).toLowerCase()){
+    return {ok:true,message:"Claim #"+i+" was registered and verified on-chain."};
+   }
+  }
+  return {ok:false,message:"Registered claim not visible yet. Recheck the existing transaction hash."};
+ }
+ if(record.functionName==="review_notice"){
+  const c=toObject(await read(RELYNX,"claim_status",[id]));
+  if(String(c.last_notice_sha256||"").toLowerCase()===String(record.args[2]).toLowerCase()){
+   return {ok:true,message:"Notice review recorded · "+String(c.last_decision||c.state)+"."};
+  }
+  return {ok:true,message:"Review transaction executed. Notice may have returned a source diagnostic without changing state."};
+ }
+ return {ok:false,message:"Unknown write method."};
+}
+async function checkStoredRetry(record){
+ let last="Result not yet visible.";
+ for(let i=0;i<6;i++){
+  try{const result=await checkStored(record);if(result.ok)return result;last=result.message;}
+  catch(e){last=errText(e);}
+  if(i<5)await sleep(2000);
+ }
+ return {ok:false,message:last};
+}
+async function watchPending(record){
+ if(activePoll)return;
+ activePoll=true;locked=true;latestHash=record.hash;updateSignButton();
+ const hash=record.hash;
+ try{
+  for(let attempt=0;attempt<100;attempt++){
+   try{
+    const response=await fetch("/api/tx?hash="+encodeURIComponent(hash),{cache:"no-store"});
+    const status=await response.json();
+    if(!response.ok)throw new Error(status.error||"Status lookup unavailable");
+    if(!status.found){
+     tx("Transaction submitted","Waiting for transaction to appear on Studionet…",hash,"working","STEP 2 / CONFIRMATION");
+    }else{
+     const phase=String(status.status||"UNKNOWN").toUpperCase();
+     if(phase==="FINALIZED"){
+      if(status.execution==="ERROR"){
+       clearPending();tx("Transaction failed","FINALIZED · GenVM execution returned an error. No successful action receipt can be claimed.",hash,"error","FINALIZED / ERROR");return;
+      }
+      if(status.execution==="SUCCESS"){
+       tx("Execution confirmed","GenVM reported SUCCESS. Checking the new on-chain record…",hash,"working","STEP 3 / VERIFYING");
+       const recordCheck=await checkStoredRetry(record);
+       if(recordCheck.ok){
+        clearPending();
+        tx("Transaction successful",recordCheck.message,hash,"success","FINALIZED / SUCCESS");
+        try{await refresh();}catch{}
+       }else{
+        tx("Finalized · verifying record",recordCheck.message,hash,"unknown","FINALIZED / READBACK PENDING");
+       }
+       return;
+      }
+      tx("Finalized · result unverified","Execution details are not yet available. Use the same transaction hash to check again.",hash,"unknown","FINALIZED / CHECK REQUIRED");
+      return;
+     }
+     if(["CANCELED","UNDETERMINED","LEADER_TIMEOUT","VALIDATORS_TIMEOUT"].includes(phase)){
+      clearPending();
+      tx("Transaction not completed","Network finished with status "+phase+". Check Explorer before trying a new transaction.",hash,"error",phase);
+      return;
+     }
+     const label=phase==="ACCEPTED"?"Consensus accepted. Awaiting finalization…":"GenLayer validators are processing: "+phase.toLowerCase()+".";
+     tx("Processing on GenLayer",label,hash,"working","STEP 2 / FINALIZING");
+    }
+   }catch(e){
+    tx("Checking transaction","Status service is temporarily unavailable; still checking your existing hash.",hash,"working","STEP 2 / RETRYING");
+   }
+   await sleep(3500);
+  }
+  tx("Still pending","Finality could not be confirmed. Use Check transaction again or Explorer; do not sign a duplicate.",hash,"unknown","STATUS NOT YET CONFIRMED");
+ }finally{
+  activePoll=false;locked=false;updateSignButton();
+ }
+}
 async function write(address,functionName,args){
  if(locked)return;
- if(!wallet||!account){tx("Connect wallet first","Connect a wallet on GenLayer Studionet to sign.");return;}
+ const existing=getPending();
+ if(existing){
+  tx("Transaction needs verification","A previously submitted hash still needs confirmation. Check it before signing another action.",existing.hash,"unknown","CHECK PREVIOUS TRANSACTION");
+  return;
+ }
+ if(!wallet||!account){tx("Connect wallet first","Connect your Studionet wallet to sign.",null,"error");return;}
  locked=true;latestHash=null;updateSignButton();
- const request={address,functionName,args};
- try {
-  tx("Confirm in wallet","Review the transaction in your wallet. No duplicate submission.");
-  const hash=await wallet.writeContract({...request,value:0n});
-  latestHash=hash;tx("Submitted to GenLayer","Waiting for a finalized result. Do not submit again.",hash);
-  let receipt;
-  try{receipt=await reader.waitForTransactionReceipt({hash,status:TransactionStatus.FINALIZED});}
-  catch(error){
-   tx("Submitted · finality not verified","Transaction was sent, but finalization could not be checked: "+errText(error)+". Inspect Explorer before retrying.",hash);
-   return;
-  }
-  const succeeded=receipt.statusName===TransactionStatus.FINALIZED &&
-    receipt.txExecutionResultName===ExecutionResult.FINISHED_WITH_RETURN;
-  if(!succeeded){
-   tx("Transaction not successful","Finalized status: "+String(receipt.statusName||"unknown")+
-     " · execution: "+String(receipt.txExecutionResultName||"unknown")+". Review Explorer.",hash);
-   return;
-  }
-  tx("Transaction successful","FINALIZED and GenVM SUCCESS. Refreshing claim and receipt state…",hash);
-  await refresh();
-  if(functionName==="perform_action"){
-    await checkGate();
-    document.querySelector("#gate")?.scrollIntoView({behavior:"smooth",block:"center"});
-  }
- }catch(error){
-  tx(latestHash?"Transaction status uncertain":"Wallet / fee error",errText(error)+(latestHash?" · Check Explorer before any retry.":""));
+ const actor=account;
+ try{
+  tx("Confirm in wallet","Approve the transaction in your wallet. This is not yet a submitted transaction.",null,"working","STEP 1 / SIGNING");
+  const hash=await wallet.writeContract({address,functionName,args,value:0n});
+  if(!/^0x[0-9a-fA-F]{64}$/.test(String(hash)))throw new Error("Wallet returned an invalid transaction hash");
+  const record={hash:String(hash),functionName,args,actor,address};
+  savePending(record);
+  tx("Submitted to GenLayer","Wallet signature received. Waiting for consensus and finalization…",hash,"working","STEP 2 / FINALIZING");
+  await watchPending(record);
+ }catch(e){
+  const stored=getPending();
+  tx(stored?"Transaction submitted · status unknown":"Transaction not submitted",
+     errText(e)+(stored?" Check the existing hash in Explorer; do not sign again.":""),
+     stored?.hash??null,stored?"unknown":"error",stored?"CHECK STATUS":"WALLET / SUBMISSION");
  }finally{locked=false;updateSignButton();}
 }
 $("refresh").onclick=refresh;
@@ -211,7 +312,8 @@ $("preset3").onclick=()=>loadClaim(3);
 $("choose2").onclick=()=>setGateChoice(2);
 $("choose3").onclick=()=>setGateChoice(3);
 $("connectWallet").onclick=connectWallet;
-$("dismissTx").onclick=()=>{$("txPanel").hidden=true;};
+$("dismissTx").onclick=()=>{if($("txPanel").dataset.state!=="working")$("txPanel").hidden=true;};
+$("checkTx").onclick=()=>{const existing=getPending();if(existing&&!locked)watchPending(existing);};
 $("checkAction").onclick=checkGate;
 $("actionForm").onsubmit=async e=>{
  e.preventDefault();
@@ -239,3 +341,5 @@ window.ethereum?.on?.("accountsChanged",()=>{wallet=null;account=null;gateAllowe
 window.ethereum?.on?.("chainChanged",()=>{wallet=null;account=null;gateAllowed=false;$("walletState").textContent="Network changed · reconnect";$("connectWallet").textContent="Connect wallet";updateSignButton();});
 setGateChoice(3);
 refresh().then(()=>checkGate());
+const pendingOnLoad=getPending();
+if(pendingOnLoad){tx("Resuming transaction","Rechecking the submitted hash after page reload…",pendingOnLoad.hash,"working","STEP 2 / FINALIZING");watchPending(pendingOnLoad);}
