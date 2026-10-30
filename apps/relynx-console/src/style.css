@@ -16,3 +16,25 @@
 .claims-layout{grid-template-columns:250px minmax(0,1fr)}
 @media(max-width:1000px){.main{padding:20px 26px}.masthead{margin-bottom:23px}}
 @media(max-width:710px){.main{padding:15px 14px}.masthead{align-items:flex-start;flex-wrap:wrap}.mast-right{width:100%;justify-content:space-between;gap:8px}.network{order:2}.top h1{font-size:34px}.claims-layout{grid-template-columns:1fr}.panel{padding:17px}}
+
+/* Transaction feedback: always visible while a signed write is pending. */
+.tx-panel{width:min(430px,calc(100vw - 28px));padding:22px;border:1px solid #37594c;background:#12231f;box-shadow:0 24px 80px #000b;z-index:110}
+.tx-panel[hidden],.tx-spinner[hidden],.tx-mark[hidden],.tx-close[hidden],.tx-foot [hidden]{display:none!important}
+.tx-layout{display:flex;align-items:flex-start;gap:15px}
+.tx-copy{flex:1;min-width:0}
+.tx-copy h3{margin:8px 0 7px;font-size:16px;color:#f0fbf5}
+.tx-copy p{line-height:1.55;font-size:12px;color:#bed1cb;overflow-wrap:anywhere}
+.tx-spinner{flex:none;display:block;width:33px;height:33px;border:3px solid #4a6a60;border-top-color:#b3f7ce;border-radius:50%;animation:relynx-rotate .85s linear infinite;margin-top:4px}
+@keyframes relynx-rotate{to{transform:rotate(360deg)}}
+.tx-mark{display:grid;place-items:center;flex:none;width:33px;height:33px;border-radius:50%;background:#2f7654;color:#dbffe9;font-weight:900;font-size:18px;margin-top:4px}
+.tx-panel[data-state="error"]{border-color:#975151;background:#291c20}
+.tx-panel[data-state="error"] .tx-mark{background:#874044;color:#ffe2df}
+.tx-panel[data-state="unknown"]{border-color:#968255;background:#2b271d}
+.tx-panel[data-state="unknown"] .tx-mark{background:#8a7547;color:#fff2c4}
+.tx-panel[data-state="success"]{border-color:#58aa80;background:#16372b}
+.tx-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 0 47px}
+.tx-foot a{margin:0;color:#b6efd2;font-size:11px}
+.tx-foot button{padding:7px 10px;font-size:11px}
+.tx-panel .tx-close{top:7px;right:8px}
+@media(max-width:620px){.tx-panel{right:14px;bottom:14px;max-width:calc(100vw - 28px)}}
+@media(prefers-reduced-motion:reduce){.tx-spinner{animation-duration:2s}}
