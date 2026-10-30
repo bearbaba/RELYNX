@@ -1,27 +1,33 @@
 # RELYNX Console (Project candidate)
 
-**Status:** Frontend build candidate. This is a new GenLayer Project application, separate from the already accepted RELYNX Intelligent Contract contribution. **Do not submit to Project Explorer before a public HTTPS preview has passed actual signed browser testing.**
+**Status (30 October 2026):** Vite production build returned READY on Vercel staging. Browser/RPC and signed wallet acceptance have **not yet been independently verified**. This is a new GenLayer Project application, separate from the already accepted RELYNX Intelligent Contract contribution. **Do not submit to Project Explorer before a public HTTPS preview has passed actual signed browser testing.**
 
 ## Run locally
 
-\`\`\`bash
+```bash
 npm install
 npm run dev
-\`\`\`
+```
+
+## Preview deployment
+
+[Open the staging build](https://relynx-console-e8ikrrxwk-khaiptk1998-8088s-projects.vercel.app/) (Vercel Authentication may require team login).
+
+Vercel project: `relynx-console` in team `khaiptk1998-8088s-projects`. Git is connected to `bearbaba/RELYNX`; frontend root directory is `apps/relynx-console`. The staging build was deployed from exact GitHub source files, and future repo builds use the configured root. The staging build has **not** passed live browser signing checks, and the site is not yet a public Project Explorer submission.
 
 ## Deploy
 
-Vercel Vite project root: \`apps/relynx-console\`. Node 22. The application connects to the **existing** Studionet contracts; it does not deploy or upgrade them.
+Vercel Vite project root: `apps/relynx-console`. Node 22. The application connects to the **existing** Studionet contracts; it does not deploy or upgrade them.
 
-- Source RELYNX: \`0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa\`
-- Consumer Gate: \`0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b\`
-- Chain: \`61999\`
+- Source RELYNX: `0x69c3468823F60Fc6a37b3c141EEc1Bd2fD8176Fa`
+- Consumer Gate: `0xe3421601C4F2Fc5cb5b7922cbA98fA0A6B701B0b`
+- Chain: `61999`
 
 ## Features
 
 - Finalized-state read-only claim discovery and detail view
-- Dependency state and derived \`can_rely\` visibility
-- Cross-IC \`can_act\` eligibility read, consumer action receipts
+- Dependency state and derived `can_rely` visibility
+- Cross-IC `can_act` eligibility read, consumer action receipts
 - EIP-1193 wallet connect for Studionet and signed consumer actions
 - Register claims and review pinned issuer notices through the existing source contract
 - Transaction hash, finalization and **execution result** checks before displaying success
@@ -31,7 +37,7 @@ Vercel Vite project root: \`apps/relynx-console\`. Node 22. The application conn
 
 - The browser needs working RPC access to Studionet; network resets and website content drift can break historic demo state.
 - Wallet extension required for writes. Contract claims are issuer assertions, not universal identity proofs.
-- SDK pinned to \`genlayer-js@2.0.0-rc.2\` and must be retested against the deployed Studionet after every SDK upgrade.
+- SDK pinned to `genlayer-js@2.0.0-rc.2` and must be retested against the deployed Studionet after every SDK upgrade.
 - Fee simulations may be costly or fail for expected reverts; never bypass a failed estimate silently.
 - A denied transaction can be FINALIZED but execute with ERROR. UI must distinguish these states.
 - Existing RELYNX Consumer Gate stores **demo action receipts**, not payments or actual authorization to external resources.
